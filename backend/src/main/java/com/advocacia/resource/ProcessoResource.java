@@ -191,6 +191,36 @@ public class ProcessoResource {
 
     }
 
+    @PUT
+    @Path("/{id}/movimentacoes/{movId}")
+    @Transactional
+
+    public Response atualizarMovimentacao(@PathParam("id") Long id, @PathParam("movId") Long movId, MovimentacaoRequest request) {
+
+        Processo processo = Processo.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (processo == null) return Response.status(404).build();
+
+        Movimentacao movimentacao = Movimentacao.find("id = ?1 and processoId = ?2 and userId = ?3", movId, id, getUserId()).firstResult();
+        if (movimentacao == null) return Response.status(404).build();
+
+        movimentacao.descricao = request.descricao;
+
+        if (request.data != null) {
+            movimentacao.data = request.data;
+        }
+
+        movimentacao.persist();
+        MovimentacaoResponse response = new MovimentacaoResponse();
+
+        response.id = movimentacao.id;
+        response.processoId = movimentacao.processoId;
+        response.descricao = movimentacao.descricao;
+        response.data = movimentacao.data;
+
+        return Response.ok(response).build();
+        
+    }
+
     @DELETE
     @Path("/{id}/movimentacoes/{movId}")
     @Transactional
