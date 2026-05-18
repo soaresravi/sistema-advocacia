@@ -19,9 +19,7 @@ public class Processo extends PanacheEntity {
     @Enumerated(EnumType.STRING)
     public StatusProcesso status;
 
-    @Enumerated(EnumType.STRING)
-    public TipoAcao tipoAcao;
-
+    public String tipoAcao;
     public String tipoCliente;
     public Long clienteId;
     public String clienteNome;

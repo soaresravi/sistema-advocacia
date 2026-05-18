@@ -9,7 +9,7 @@ public class ProcessoResponse {
     public Long id;
     public String numeroProcesso;
     public StatusProcesso status;
-    public TipoAcao tipoAcao;
+    public String tipoAcao;
     public String tipoCliente;
     public Long clienteId;
     public String clienteNome;
