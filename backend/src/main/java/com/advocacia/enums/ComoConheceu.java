@@ -2,7 +2,7 @@ package com.advocacia.enums;
 
 public enum ComoConheceu {
     
-    ANUNCIO("Anuncio"),
+    ANUNCIO("Anúncio"),
     FAMILIA_AMIGO("É família/Amigo"),
     GOOGLE("Google"),
     INDICACAO("Indicação"),
