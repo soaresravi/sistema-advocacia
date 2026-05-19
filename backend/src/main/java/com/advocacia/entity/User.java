@@ -27,6 +27,12 @@ public class User extends PanacheEntity {
     @Column(name = "updated_at")
     public LocalDateTime updatedAt;
 
+    @Column(name = "google_refresh_token", columnDefinition = "TEXT")
+    public String googleRefreshToken;
+
+    @Column(name = "google_email")
+    public String googleEmail;
+
     @PrePersist
 
     public void prePersist() {

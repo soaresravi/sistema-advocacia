@@ -20,6 +20,9 @@ public class Pericia extends PanacheEntity {
     public Long userId;
     public LocalDateTime createdAt, updatedAt;
 
+    @Column(name = "google_event_id")
+    public String googleEventId;
+
     @PrePersist
     
     public void prePersist() {

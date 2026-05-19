@@ -3,6 +3,7 @@ package com.advocacia.resource;
 import com.advocacia.dto.*;
 import com.advocacia.entity.*;
 import com.advocacia.enums.StatusEvento;
+import com.advocacia.service.GoogleCalendarService;
 
 import io.quarkus.panache.common.Page;
 
@@ -29,6 +30,9 @@ public class PericiaResource {
     
     @Inject
     JsonWebToken jwt;
+
+    @Inject
+    GoogleCalendarService googleCalendarService;
 
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
@@ -108,6 +112,25 @@ public class PericiaResource {
         entity.processoNumero = processo.numeroProcesso;
         entity.persist();
 
+        try {
+            
+            User user = User.findById(getUserId());
+
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty()) {
+
+                String titulo = "Perícia - " + entity.processoNumero;
+                String descricao = "Processo: " + entity.processoNumero + "\n" + "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "Local: " + (entity.local != null ? entity.local : "A definir") + "Observações: " + (entity.observacoes != null ? entity.observacoes : "");
+                String eventId = googleCalendarService.criarEvento(user.googleRefreshToken, user.googleEmail, titulo, descricao, entity.data, entity.hora, 60L);
+                
+                entity.googleEventId = eventId;
+                entity.persist();
+
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao criar evento no Google Calendar: " + e.getMessage());
+        }
+
         return Response.status(Response.Status.CREATED).entity(toResponse(entity)).build();
 
     }
@@ -123,11 +146,36 @@ public class PericiaResource {
 
         Processo processo = Processo.find("id = ?1 and userId = ?2", request.processoId, getUserId()).firstResult();
         if (processo == null) return Response.status(404).entity(Map.of("error", "Processo não encontrado")).build();
-
+        
         updateEntity(entity, request);
         entity.processoNumero = processo.numeroProcesso;
-
         entity.persist();
+
+        try {
+
+            User user = User.findById(getUserId());
+            
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && entity.googleEventId != null) {
+          
+                String titulo = "Perícia - " + entity.processoNumero;
+                String descricao = "Processo: " + entity.processoNumero + "\n" + "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "Local: " + (entity.local != null ? entity.local : "A definir");
+                googleCalendarService.atualizarEvento(user.googleRefreshToken, entity.googleEventId, titulo, descricao, entity.data, entity.hora, 60L);
+          
+            } else if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && entity.googleEventId == null) {
+
+                String titulo = "Perícia - " + entity.processoNumero;
+                String descricao = "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "Local: " + (entity.local != null ? entity.local : "A definir");
+                String eventId = googleCalendarService.criarEvento(user.googleRefreshToken, user.googleEmail, titulo, descricao, entity.data, entity.hora, 60L);
+
+                entity.googleEventId = eventId;
+                entity.persist();
+
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar evento no Google Calendar: " + e.getMessage());
+        }
+
         return Response.ok(toResponse(entity)).build();
 
     }
@@ -137,9 +185,29 @@ public class PericiaResource {
     @Transactional
 
     public Response deletar(@PathParam("id") Long id) {
+
+        Pericia entity = Pericia.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (entity == null) return Response.status(404).build();
+
+        String googleEventId = entity.googleEventId;
+
         long deleted = Pericia.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+
+        try {
+            
+            User user = User.findById(getUserId());
+            
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && googleEventId != null) {
+                googleCalendarService.deletarEvento(user.googleRefreshToken, googleEventId);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao deletar evento do Google Calendar: " + e.getMessage());
+        }
+
         return Response.noContent().build();
+
     }
 
     @GET

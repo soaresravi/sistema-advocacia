@@ -1,8 +1,10 @@
 package com.advocacia.resource;
 
 import com.advocacia.dto.*;
-import com.advocacia.entity.Atendimento;
+import com.advocacia.entity.*;
 import com.advocacia.enums.*;
+import com.advocacia.service.GoogleCalendarService;
+
 import io.quarkus.panache.common.Page;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -29,6 +31,9 @@ public class AtendimentoResource {
     
     @Inject
     JsonWebToken jwt;
+
+    @Inject
+    GoogleCalendarService googleCalendarService;
 
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
@@ -103,11 +108,32 @@ public class AtendimentoResource {
     @Transactional
 
     public Response criar(AtendimentoRequest request) {
+        
         Atendimento entity = new Atendimento();
         entity.userId = getUserId();
         updateEntity(entity, request);
         entity.persist();
+
+        try {
+
+            User user = User.findById(getUserId());
+
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty()) {
+                
+                String titulo = "Atendimento - " + entity.nome;
+                String descricao = "Assunto: " + (entity.assunto != null ? entity.assunto : "") + "\n" + "Telefone: " + (entity.telefone != null ? entity.telefone : "") + "\n" + "Email: " + (entity.email != null ? entity.email : "");
+                String eventId = googleCalendarService.criarEvento(user.googleRefreshToken, user.googleEmail, titulo, descricao, entity.data, entity.hora, 30L);
+
+                entity.googleEventId = eventId;
+                entity.persist();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao criar evento no Google Calendar: " + e.getMessage());
+        }
+
         return Response.status(Response.Status.CREATED).entity(toResponse(entity)).build();
+
     }
 
     @PUT
@@ -115,11 +141,40 @@ public class AtendimentoResource {
     @Transactional
 
     public Response atualizar(@PathParam("id") Long id, AtendimentoRequest request) {
+
         Atendimento entity = Atendimento.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
         if (entity == null) return Response.status(404).build();
+
         updateEntity(entity, request);
         entity.persist();
+
+        try {
+
+            User user = User.findById(getUserId());
+
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && entity.googleEventId != null) {
+          
+                String titulo = "Atendimento - " + entity.nome;
+                String descricao = "Assunto: " + (entity.assunto != null ? entity.assunto : "") + "\n" + "Telefone: " + (entity.telefone != null ? entity.telefone : "") + "\n" + "Email: " + (entity.email != null ? entity.email : "");
+                googleCalendarService.atualizarEvento(user.googleRefreshToken, entity.googleEventId, titulo, descricao, entity.data, entity.hora, 30L);
+          
+            } else if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && entity.googleEventId == null) {
+
+                String titulo = "Atendimento - " + entity.nome;
+                String descricao = "Assunto: " + (entity.assunto != null ? entity.assunto : "") + "\n" + "Telefone: " + (entity.telefone != null ? entity.telefone : "") + "\n" + "Email: " + (entity.email != null ? entity.email : "");
+                String eventId = googleCalendarService.criarEvento(user.googleRefreshToken, user.googleEmail, titulo, descricao, entity.data, entity.hora, 30L);
+
+                entity.googleEventId = eventId;
+                entity.persist();
+
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar evento no Google Calendar: " + e.getMessage());
+        }
+
         return Response.ok(toResponse(entity)).build();
+
     }
 
     @DELETE
@@ -127,8 +182,27 @@ public class AtendimentoResource {
     @Transactional
 
     public Response deletar(@PathParam("id") Long id) {
+
+        Atendimento entity = Atendimento.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (entity == null) return Response.status(404).build();
+
+        String googleEventId = entity.googleEventId;
+
         long deleted = Atendimento.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+
+        try {
+
+            User user = User.findById(getUserId());
+            
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && googleEventId != null) {
+                googleCalendarService.deletarEvento(user.googleRefreshToken, googleEventId);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao deletar evento do Google Calendar: " + e.getMessage());
+        }
+
         return Response.noContent().build();
     }
 

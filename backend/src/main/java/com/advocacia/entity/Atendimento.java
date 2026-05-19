@@ -32,6 +32,9 @@ public class Atendimento extends PanacheEntity {
     @Column(columnDefinition = "TEXT")
     public String observacoes;
 
+    @Column(name = "google_event_id")
+    public String googleEventId;
+
     public Long userId;
     public LocalDateTime createdAt, updatedAt;
 
