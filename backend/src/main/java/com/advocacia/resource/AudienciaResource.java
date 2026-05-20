@@ -119,7 +119,7 @@ public class AudienciaResource {
             if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty()) {
 
                 String titulo = "Audiência - " + entity.processoNumero;
-                String descricao = "Processo: " + entity.processoNumero + "\n" + "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "Local: " + (entity.local != null ? entity.local : "A definir") + "Observações: " + (entity.observacoes != null ? entity.observacoes : "");
+                String descricao = "Processo: " + entity.processoNumero + "\n" + "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "\n" + "Local: " + (entity.local != null ? entity.local : "A definir") + "\n" + "Observações: " + (entity.observacoes != null ? entity.observacoes : "");
                 String eventId = googleCalendarService.criarEvento(user.googleRefreshToken, user.googleEmail, titulo, descricao, entity.data, entity.hora, 60L);
 
                 entity.googleEventId = eventId;
@@ -158,13 +158,13 @@ public class AudienciaResource {
             if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && entity.googleEventId != null) {
                 
                 String titulo = "Audiência - " + entity.processoNumero;
-                String descricao = "Processo: " + entity.processoNumero + "\n" + "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "Local: " + (entity.local != null ? entity.local : "A definir");
+                String descricao = "Processo: " + entity.processoNumero + "\n" + "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "\n" + "Local: " + (entity.local != null ? entity.local : "A definir");
                 googleCalendarService.atualizarEvento(user.googleRefreshToken, entity.googleEventId, titulo, descricao, entity.data, entity.hora, 60L);
 
             } else if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && entity.googleEventId == null) {
                 
                 String titulo = "Audiência - " + entity.processoNumero;
-                String descricao = "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "Local: " + (entity.local != null ? entity.local : "A definir");
+                String descricao = "Detalhes: " + (entity.detalhes != null ? entity.detalhes : "") + "\n" + "Local: " + (entity.local != null ? entity.local : "A definir");
                 String eventId = googleCalendarService.criarEvento(user.googleRefreshToken, user.googleEmail, titulo, descricao, entity.data, entity.hora, 60L);
 
                 entity.googleEventId = eventId;

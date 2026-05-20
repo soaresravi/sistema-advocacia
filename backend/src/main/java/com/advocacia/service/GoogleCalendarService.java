@@ -16,7 +16,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 import java.util.Collections;
 
@@ -64,20 +63,22 @@ public class GoogleCalendarService {
     }
 
     public String criarEvento(String refreshToken, String email, String titulo, String descricao, LocalDate data, String hora, Long duracaoMinutos) throws Exception {
-
+        
         Credential credential = createCredential(refreshToken);
         Calendar service = new Calendar.Builder(new NetHttpTransport(), JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx");
-        LocalDateTime starDateTime = LocalDateTime.of(data, LocalTime.parse(hora));
-        LocalDateTime endDateTime = starDateTime.plusMinutes(duracaoMinutos);
-
-        EventDateTime start = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(starDateTime.format(formatter)));
-        EventDateTime end = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(endDateTime.format(formatter)));
-
+        
+        LocalDateTime startDateTime = LocalDateTime.of(data, LocalTime.parse(hora));
+        LocalDateTime endDateTime = startDateTime.plusMinutes(duracaoMinutos);
+        
+        java.time.ZonedDateTime startZoned = startDateTime.atZone(java.time.ZoneId.systemDefault());
+        java.time.ZonedDateTime endZoned = endDateTime.atZone(java.time.ZoneId.systemDefault());
+        
+        EventDateTime start = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(startZoned.toInstant().toEpochMilli()));
+        EventDateTime end = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(endZoned.toInstant().toEpochMilli()));
         Event event = new Event().setSummary(titulo).setDescription(descricao).setStart(start).setEnd(end);
+        
         return service.events().insert("primary", event).execute().getId();
-    
+
     }
 
     private Credential createCredential(String refreshToken) throws Exception { com.google.api.client.http.GenericUrl tokenServerUrl = new com.google.api.client.http.GenericUrl("https://oauth2.googleapis.com/token");
@@ -90,12 +91,14 @@ public class GoogleCalendarService {
         Calendar service = new Calendar.Builder(new NetHttpTransport(), JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
         Event existingEvent = service.events().get("primary", eventId).execute();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx");
         LocalDateTime startDateTime = LocalDateTime.of(data, LocalTime.parse(hora));
         LocalDateTime endDateTime = startDateTime.plusMinutes(duracaoMinutos);
 
-        EventDateTime start = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(startDateTime.format(formatter)));
-        EventDateTime end = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(endDateTime.format(formatter)));
+        java.time.ZonedDateTime startZoned = startDateTime.atZone(java.time.ZoneId.systemDefault());
+        java.time.ZonedDateTime endZoned = endDateTime.atZone(java.time.ZoneId.systemDefault());
+
+        EventDateTime start = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(startZoned.toInstant().toEpochMilli()));
+        EventDateTime end = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(endZoned.toInstant().toEpochMilli()));
 
         existingEvent.setSummary(titulo);
         existingEvent.setDescription(descricao);
