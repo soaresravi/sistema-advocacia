@@ -1,0 +1,191 @@
+.login-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #32081e 0%, #1f0412 100%);
+    position: relative;
+}
+
+.login-overlay {
+    min-height: 100vh;
+}
+  
+.login-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    padding: 20px 30px 40px;
+    border: none;
+}
+  
+.login-card .ant-card-body {
+    padding: 0;
+}
+  
+.login-avatar {
+    text-align: center;
+    margin-bottom: 24px;
+}
+  
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #4e0c1e 0%, #350511 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(139, 26, 74, 0.3);
+}
+  
+.login-tabs .ant-tabs-nav {
+    margin-bottom: 16px;
+}
+  
+.login-tabs .ant-tabs-nav::before {
+    border-bottom: none;
+}
+  
+.login-tabs .ant-tabs-tab {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+}
+  
+.login-tabs .ant-tabs-tab-active .tab-label {
+    color: #4e0c1e;
+}
+  
+.login-tabs .ant-tabs-ink-bar {
+    background: #4e0c1e;
+}
+  
+.login-form {
+    margin-top: 16px;
+}
+  
+.login-input {
+    border-radius: 12px;
+    border: 1px solid #999;
+    transition: all 0.3s;
+}
+  
+.login-input:hover {
+    border-color: #4e0c1e;
+}
+  
+.login-input:focus, .login-input-focused {
+    border-color: #4e0c1e;
+    box-shadow: 0 0 0 2px rgba(139, 26, 74, 0.1);
+}
+  
+.input-icon {
+    color: #999;
+}
+  
+.login-button {
+    background: linear-gradient(135deg, #4e0c1e 0%, #350511 100%);
+    border: none;
+    border-radius: 12px;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+}
+  
+.login-button:hover {
+    background: linear-gradient(135deg, rgb(111, 19, 36) 0%, #5c0b1f 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 26, 74, 0.3);
+}
+  
+.login-input::placeholder, .login-input .ant-input-password input::placeholder {
+    color: #9f9f9f;
+    font-family: 'Poppins', sans-serif;
+}
+  
+.ant-input-password .ant-input-password-icon {
+    color: #999;
+}
+  
+.ant-input-password .ant-input-password-icon:hover {
+    color: #4e0c1e;
+}
+
+  
+.login-tabs .ant-tabs-nav-wrap {
+    justify-content: center;
+}
+  
+.ant-form-item-explain-error {
+    margin-bottom: 8px !important;
+}
+
+.login-input .ant-input-prefix + input::placeholder, .login-input .ant-input-affix-wrapper input::placeholder {
+    color: #424242 !important;
+}
+
+.ant-input-password input::placeholder {
+  color: #424242 !important;
+}
+
+.login-tabs .ant-tabs-tab:hover {
+    color: #972230;
+}
+
+.ant-notification {
+    font-family: 'Poppins', sans-serif;
+}
+  
+.ant-notification-notice {
+    border-radius: 12px !important;
+    padding: 12px 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    background: #ffffff !important;
+    min-width: 280px !important;
+    max-width: 320px !important;
+    overflow: hidden !important;
+}
+  
+.ant-notification-notice-icon {
+    font-size: 16px !important;
+}
+  
+.ant-notification-notice-description {
+    font-size: 14px !important;
+    color: #000000 !important;
+    line-height: 1.3 !important;
+}
+  
+.ant-notification-notice-close {
+    top: 8px !important;
+    right: 8px !important;
+    font-size: 10px !important;
+    width: 18px !important;
+    height: 18px !important;
+    line-height: 18px !important;
+}
+  
+.ant-notification-notice-close:hover {
+    color: #8b1a4a !important;
+}
+  
+.ant-notification-notice-progress {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 2px !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+}
+  
+.ant-notification-notice-progress .ant-progress-inner {
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+  
+.ant-notification-notice-progress .ant-progress-bg {
+    background: linear-gradient(90deg, #4e0c1e, #8b1a4a) !important;
+    border-radius: 0 !important;
+}

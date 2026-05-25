@@ -1,0 +1,66 @@
+.ant-menu-dark {
+  background: transparent !important;
+}
+
+.ant-menu-dark .ant-menu-item, .ant-menu-dark .ant-menu-submenu-title {
+  color: #d4c0c4 !important;
+  transition: all 0.3s;
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
+}
+
+.ant-menu-dark .ant-menu-item:hover, .ant-menu-dark .ant-menu-submenu-title:hover {
+  background: linear-gradient(rgba(0, 0, 0, 0.3) ) !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background: linear-gradient(rgba(0, 0, 0, 0.3) ) !important;
+  color: #fff !important;
+}
+
+.ant-menu-dark .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: #8b1a4a !important;
+}
+
+.ant-menu-item .anticon, .ant-menu-submenu-title .anticon {
+  font-size: 18px !important;
+}
+
+.ant-menu-dark .ant-menu-sub {
+  background: transparent !important;
+  border-radius: 12px !important;
+  font-size: 13px;
+  margin: 4px 0 !important;
+}
+
+.ant-menu-inline-collapsed-tooltip {
+    display: none !important;
+}
+  
+.ant-menu-submenu-popup {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+  
+.ant-menu-submenu-popup .ant-menu {
+    background: linear-gradient(135deg, #4e0c1e 0%, #350511 100%) !important;
+    border-radius: 12px !important;
+    padding: 8px 0 !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item {
+    color: #d4c0c4 !important;
+    margin: 4px 8px !important;
+    border-radius: 8px !important;
+    width: calc(100% - 16px) !important;
+}
+  
+.ant-menu-submenu-popup .ant-menu-item:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item .anticon {
+    color: inherit !important;
+}
