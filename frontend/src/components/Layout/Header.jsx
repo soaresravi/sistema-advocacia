@@ -26,7 +26,7 @@ function Header() {
   <AntHeader style={{ background: '#fff', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
     
     <div>
-      <Text strong>Bem-vindo, {user.nome || 'Usuário'}!</Text>
+      <Text strong style={{color: '#4e0c1e'}}>Bem-vindo, {user.nome || 'Usuário'}!</Text>
     </div>
   
     <Dropdown menu={{ items: menuItems }} placement="bottomRight">

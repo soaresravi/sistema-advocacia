@@ -27,15 +27,17 @@ api.interceptors.request.use((config) => {
 }, (error) => Promise.reject(error) );
 
 api.interceptors.response.use((response) => response, (error) => {
-
-    if (error.response?.status === 401) {
+    
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+          
+    if ((error.response?.status === 401 || error.response?.status === 403) && !isLoginRequest) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        window.dispatchEvent(new Event('auth:logout'));
     }
-
+          
     return Promise.reject(error);
-
+    
 });
 
 export default api;

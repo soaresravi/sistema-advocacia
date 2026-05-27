@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { Form, Input, Button, Card, Tabs, Row, Col, Typography, notification } from 'antd';
+import { Form, Input, Button, Card, Tabs, Row, Col, notification } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import api from '../../services/api';
 import './Login.css';
-
-const { Title, Text } = Typography;
 
 function Login({ onLogin }) {
     
