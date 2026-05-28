@@ -182,3 +182,11 @@ textarea.ant-input:focus, .ant-input-textarea textarea:focus {
   border-color: #4e0c1e !important;
   outline: none !important;
 }
+
+.ant-picker:hover, .ant-picker-focused, .ant-picker-range:hover, .ant-picker-range-focused {
+  border-color: #4e0c1e !important;
+}
+
+.ant-picker-range .ant-picker-active-bar {
+  background: #4e0c1e !important;
+}

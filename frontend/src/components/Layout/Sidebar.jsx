@@ -35,7 +35,6 @@ function Sidebar() {
       { key: '/processos/dashboard', icon: <BarChartOutlined />, label: 'Dashboard', onClick: () => navigate('/processos/dashboard'), },
       { key: '/processos/lista', icon: <UnorderedListOutlined />, label: 'Processos', onClick: () => navigate('/processos/lista'), },
       { key: '/processos/prazos', icon: <ScheduleOutlined />, label: 'Prazos', onClick: () => navigate('/processos/prazos'), },
-      { key: '/processos/movimentacoes', icon: <FileTextOutlined />, label: 'Movimentações', onClick: () => navigate('/processos/movimentacoes'), },
     ], },
     
     { key: 'eventos', icon: <CalendarOutlined />, label: 'Eventos',

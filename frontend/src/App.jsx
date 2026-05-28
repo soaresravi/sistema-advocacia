@@ -6,6 +6,9 @@ import AppLayout from './components/Layout/AppLayout.jsx';
 import ClientesDashboard from './pages/Clientes/ClientesDashboard';
 import ClientesLista from './pages/Clientes/ClienteLista';
 import ClientesAniversariantes from './pages/Clientes/ClientesAniversariantes';
+import ProcessosDashboard from './pages/Processos/ProcessosDashboard';
+import ProcessosLista from './pages/Processos/ProcessoLista';
+import ProcessosPrazos from './pages/Processos/ProcessosPrazos';
 
 function App() {
   
@@ -43,11 +46,18 @@ function App() {
     <AppLayout>
 
       <Routes>
+
         <Route path="/login" element={<Navigate to="/" />} />
         <Route path="/" element={<Navigate to="/dashboard" />} />   
+
         <Route path="/clientes/dashboard" element={<ClientesDashboard />} />
         <Route path="/clientes/lista" element={<ClientesLista />} />
         <Route path="/clientes/aniversariantes" element={<ClientesAniversariantes /> } />
+
+        <Route path="/processos/dashboard" element={<ProcessosDashboard /> } />
+        <Route path="/processos/lista" element={<ProcessosLista /> } />
+        <Route path="/processos/prazos" element={<ProcessosPrazos /> } />
+        
       </Routes>
       
     </AppLayout>
