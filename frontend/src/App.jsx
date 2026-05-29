@@ -14,6 +14,8 @@ import AudienciaLista from './pages/Audiencias/AudienciaLista';
 import GoogleCallback from './pages/GoogleCallback';
 import PericiasDashboard from './pages/Pericias/PericiasDashboard';
 import PericiaLista from './pages/Pericias/PericiaLista';
+import AtendimentosDashboard from './pages/Atendimentos/AtendimentosDashboard';
+import AtendimentoLista from './pages/Atendimentos/AtendimentoLista';
 
 function App() {
   
@@ -82,6 +84,9 @@ function App() {
         
         <Route path="/pericias/dashboard" element={<PericiasDashboard /> } />
         <Route path="/pericias/lista" element={<PericiaLista /> } />
+
+        <Route path="/atendimentos/dashboard" element={<AtendimentosDashboard /> } />
+        <Route path="/atendimentos/lista" element={<AtendimentoLista /> } />
         
       </Routes>
       

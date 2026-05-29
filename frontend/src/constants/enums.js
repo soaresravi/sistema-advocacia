@@ -174,3 +174,19 @@ export const STATUS_EVENTO_OPTIONS = [
     { value: 'CONCLUIDO', label: 'Concluído' },
     { value: 'CANCELADO', label: 'Cancelado' },
 ];
+
+export const COMO_CONHECEU_OPTIONS = [
+    { value: 'ANUNCIO', label: 'Anúncio' },
+    { value: 'FAMILIA_AMIGO', label: 'É família/Amigo' },
+    { value: 'GOOGLE', label: 'Google' },
+    { value: 'INDICACAO', label: 'Indicação' },
+    { value: 'OUTROS', label: 'Outros' },
+    { value: 'PARCERIA', label: 'Parceria' },
+    { value: 'REDES_SOCIAIS', label: 'Redes sociais' },
+    { value: 'SITE', label: 'Site' },
+];
+  
+export const SIM_NAO_OPTIONS = [
+    { value: 'SIM', label: 'Sim' },
+    { value: 'NAO', label: 'Não' },
+];

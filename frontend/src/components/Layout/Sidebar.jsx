@@ -20,21 +20,21 @@ function Sidebar() {
   const menuItems = [
     
     { key: '/dashboard', icon: <DashboardOutlined />, label: 'Painel de controle', onClick: () => navigate('/dashboard'), },
-    
-    { key: 'clientes', icon: <TeamOutlined />, label: 'Clientes',
-    
-    children: [
-      { key: '/clientes/dashboard', icon: <BarChartOutlined />, label: 'Dashboard', onClick: () => navigate('/clientes/dashboard'), },
-      { key: '/clientes/lista', icon: <UnorderedListOutlined />, label: 'Clientes', onClick: () => navigate('/clientes/lista'), },
-      { key: '/clientes/aniversariantes', icon: <GiftOutlined />, label: 'Aniversariantes', onClick: () => navigate('/clientes/aniversariantes'), },
-    ], },
-    
+  
     { key: 'processos', icon: <FolderOutlined />, label: 'Processos',
     
     children: [
       { key: '/processos/dashboard', icon: <BarChartOutlined />, label: 'Dashboard', onClick: () => navigate('/processos/dashboard'), },
       { key: '/processos/lista', icon: <UnorderedListOutlined />, label: 'Processos', onClick: () => navigate('/processos/lista'), },
       { key: '/processos/prazos', icon: <ScheduleOutlined />, label: 'Prazos', onClick: () => navigate('/processos/prazos'), },
+    ], },
+
+    { key: 'clientes', icon: <TeamOutlined />, label: 'Clientes',
+    
+    children: [
+      { key: '/clientes/dashboard', icon: <BarChartOutlined />, label: 'Dashboard', onClick: () => navigate('/clientes/dashboard'), },
+      { key: '/clientes/lista', icon: <UnorderedListOutlined />, label: 'Clientes', onClick: () => navigate('/clientes/lista'), },
+      { key: '/clientes/aniversariantes', icon: <GiftOutlined />, label: 'Aniversariantes', onClick: () => navigate('/clientes/aniversariantes'), },
     ], },
     
     { key: 'eventos', icon: <CalendarOutlined />, label: 'Eventos',
@@ -56,6 +56,13 @@ function Sidebar() {
       ], },
 
     ], },
+
+    { key: 'atendimentos', icon: <FileTextOutlined />, label: 'Atendimentos',
+    
+    children: [
+      { key: '/atendimentos/dashboard', icon: <BarChartOutlined />, label: 'Dashboard', onClick: () => navigate('/atendimentos/dashboard'), },
+      { key: '/atendimentos/lista', icon: <UnorderedListOutlined />, label: 'Atendimentos', onClick: () => navigate('/atendimentos/lista'), },
+    ], },
     
     { key: 'financeiro', icon: <DollarOutlined />, label: 'Financeiro',
     
@@ -70,13 +77,6 @@ function Sidebar() {
     children: [
       { key: '/tarefas/dashboard', icon: <BarChartOutlined />, label: 'Dashboard', onClick: () => navigate('/tarefas/dashboard'), },
       { key: '/tarefas/lista', icon: <UnorderedListOutlined />, label: 'Tarefas', onClick: () => navigate('/tarefas/lista'), },
-    ], },
-    
-    { key: 'atendimentos', icon: <FileTextOutlined />, label: 'Atendimentos',
-    
-    children: [
-      { key: '/atendimentos/dashboard', icon: <BarChartOutlined />, label: 'Dashboard', onClick: () => navigate('/atendimentos/dashboard'), },
-      { key: '/atendimentos/lista', icon: <UnorderedListOutlined />, label: 'Atendimentos', onClick: () => navigate('/atendimentos/lista'), },
     ], },
     
     { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações', onClick: () => navigate('/configuracoes'), },
