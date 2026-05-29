@@ -1,15 +1,15 @@
 export const STATUS_PROCESSO_OPTIONS = [
-    { value: 'Ativo', label: 'Ativo' },
-    { value: 'Encerrado', label: 'Encerrado' },
+    { value: 'ATIVO', label: 'Ativo' },
+    { value: 'ENCERRADO', label: 'Encerrado' },
 ];
   
 export const FASE_PROCESSO_OPTIONS = [
-    { value: 'Fase Inicial', label: 'Fase Inicial' },
-    { value: 'Fase de Audiência', label: 'Fase de Audiência' },
-    { value: 'Fase de Citação', label: 'Fase de Citação' },
-    { value: 'Fase de Conciliação', label: 'Fase de Conciliação' },
-    { value: 'Fase de Contestação', label: 'Fase de Contestação' },
-    { value: 'Fase de Sentença', label: 'Fase de Sentença' },
+    { value: 'INICIAL', label: 'Fase Inicial' },
+    { value: 'AUDIENCIA', label: 'Fase de Audiência' },
+    { value: 'CITACAO', label: 'Fase de Citação' },
+    { value: 'CONCILIACAO', label: 'Fase de Conciliação' },
+    { value: 'CONTESTACAO', label: 'Fase de Contestação' },
+    { value: 'SENTENCA', label: 'Fase de Sentença' },
 ];
   
 export const RESULTADO_PROCESSO_OPTIONS = [
@@ -167,4 +167,10 @@ export const INSTANCIA_OPTIONS = [
     { value: 'Superior Tribunal Militar', label: 'Superior Tribunal Militar' },
     { value: 'Superior Tribunal de Justiça', label: 'Superior Tribunal de Justiça' },
     { value: 'Supremo Tribunal Federal', label: 'Supremo Tribunal Federal' },
+];
+
+export const STATUS_EVENTO_OPTIONS = [
+    { value: 'AGENDADO', label: 'Agendado' },
+    { value: 'CONCLUIDO', label: 'Concluído' },
+    { value: 'CANCELADO', label: 'Cancelado' },
 ];

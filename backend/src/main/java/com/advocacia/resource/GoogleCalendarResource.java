@@ -54,7 +54,7 @@ public class GoogleCalendarResource {
         try {
 
             if (code == null || state == null) {
-                return Response.seeOther(java.net.URI.create("http://localhost:3000/configuracoes?google=error")).build();
+                return Response.seeOther(java.net.URI.create("http://localhost:5173/callback/google?google=error")).build();
             }
 
             String[] tokens = googleService.trocarCodigoPorToken(code);
@@ -69,10 +69,10 @@ public class GoogleCalendarResource {
                 user.persist();
             }
 
-            return Response.seeOther(java.net.URI.create("http://localhost:3000/configuracoes?google=success")).build();
+            return Response.seeOther(java.net.URI.create("http://localhost:5173/callback/google?google=success")).build();
 
         } catch (Exception e) {
-            return Response.seeOther(java.net.URI.create("http://localhost:3000/configuracoes?google=error")).build();
+            return Response.seeOther(java.net.URI.create("http://localhost:5173/callback/google?google=error")).build();
         }
 
     }

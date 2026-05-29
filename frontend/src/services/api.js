@@ -27,15 +27,17 @@ api.interceptors.request.use((config) => {
 }, (error) => Promise.reject(error) );
 
 api.interceptors.response.use((response) => response, (error) => {
-    
-    const isLoginRequest = error.config?.url?.includes('/auth/login');
-          
-    if ((error.response?.status === 401 || error.response?.status === 403) && !isLoginRequest) {
+
+    const isAuthError = error.response?.status === 401 || error.response?.status === 403;
+    const isLoginRequest = error.config?.url?.includes('/auth/login');    
+    const isTokenInvalid = error.response?.data?.message === "Token inválido" || error.response?.data?.message === "Token expirado";
+        
+    if ((isAuthError || isTokenInvalid) && !isLoginRequest) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.dispatchEvent(new Event('auth:logout'));
     }
-          
+        
     return Promise.reject(error);
     
 });

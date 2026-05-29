@@ -43,6 +43,32 @@ function ProcessosLista() {
     const [novoTipoAcao, setNovoTipoAcao] = useState('');
     const [tipoAcaoModalVisible, setTipoAcaoModalVisible] = useState(false);
 
+    const BACKEND_CONVERT = {
+        
+        'ATIVO': 'Ativo',
+        'ENCERRADO': 'Encerrado',
+        
+        'INICIAL': 'Fase Inicial',
+        'AUDIENCIA': 'Fase de Audiência',
+        'CITACAO': 'Fase de Citação',
+        'CONCILIACAO': 'Fase de Conciliação',
+        'CONTESTACAO': 'Fase de Contestação',
+        'SENTENCA': 'Fase de Sentença'
+    };
+    
+    const FRONTEND_CONVERT = {
+        
+        'Ativo': 'ATIVO',
+        'Encerrado': 'ENCERRADO',
+        
+        'Fase Inicial': 'INICIAL',
+        'Fase de Audiência': 'AUDIENCIA',
+        'Fase de Citação': 'CITACAO',
+        'Fase de Conciliação': 'CONCILIACAO',
+        'Fase de Contestação': 'CONTESTACAO',
+        'Fase de Sentença': 'SENTENCA'
+    };
+
     useEffect(() => {
         carregarOpcoes();
     }, []);
@@ -57,7 +83,7 @@ function ProcessosLista() {
             title: null,
             description: message,
             placement: 'bottomRight',
-            duration: 3,
+            duration: 10,
             showProgress: true,
             pauseOnHover: false,
             closable: true,
@@ -174,9 +200,14 @@ function ProcessosLista() {
         setModalVisible(true);
 
         requestAnimationFrame(() => {
+
+            const statusBackend = record.status?.descricao || record.status;
+            const faseBackend = record.fase?.descricao || record.fase;
             
             form.setFieldsValue({
                 ...record,
+                status: FRONTEND_CONVERT[statusBackend] || statusBackend,
+                fase: FRONTEND_CONVERT[faseBackend] || faseBackend,
                 tipoAcao: formatarTipoAcao(record.tipoAcao),
                 dataInicio: record.dataInicio ? dayjs(record.dataInicio) : null,
                 dataFim: record.dataFim ? dayjs(record.dataFim) : null,
@@ -226,10 +257,12 @@ function ProcessosLista() {
         try {
 
             const values = await form.validateFields();
-            setMovLoading(true);
+            setModalLoading(true);
 
             const dataToSend = {
                 ...values,
+                status: BACKEND_CONVERT[values.status] || values.status,
+                fase: BACKEND_CONVERT[values.fase] || values.fase,
                 dataInicio: values.dataInicio ? values.dataInicio.format('YYYY-MM-DD') : null,
                 dataFim: values.dataFim ? values.dataFim.format('YYYY-MM-DD') : null,
                 dataPrazo: values.dataPrazo ? values.dataPrazo.format('YYYY-MM-DD') : null,
@@ -825,15 +858,35 @@ function ProcessosLista() {
     ];
 
     const columns = [
+        
         { title: 'ID', dataIndex: 'id', width: 70 },
-        { title: 'Nº do processo', dataIndex: 'numeroProcesso', render: (text, record) => ( <Button type="link" style={{ padding: 0, color: '#4e0c1e' }} onClick={() => handleViewDetails(record)}> {text} </Button> )},
-        { title: 'Status', dataIndex: 'status', width: 100, render: (text) => text?.descricao || text },
+        
+        { title: 'Nº do processo', dataIndex: 'numeroProcesso', render: (text, record) => ( 
+            <Button type="link" style={{ padding: 0, color: '#4e0c1e' }} onClick={() => handleViewDetails(record)}> {text} </Button> 
+        )},
+
+        { title: 'Status', dataIndex: 'status', width: 100, render: (text) => {
+            const valorReal = text?.descricao || text;
+            const encontrado = STATUS_PROCESSO_OPTIONS.find(o => o.value === valorReal || o.label === valorReal);
+            return encontrado ? encontrado.label : (valorReal || '-');
+        }},
+
         { title: 'Cliente', dataIndex: 'clienteNome', width: 150 },
         { title: 'Tipo de cliente', dataIndex: 'tipoCliente', width: 100 },
         { title: 'Valor da causa', dataIndex: 'valorCausa', width: 120, render: (value) => value ? `R$ ${value.toLocaleString('pt-BR')}` : '-' },
-        { title: 'Fase', dataIndex: 'fase', width: 120, render: (text) => text?.descricao || text },
+        
+        { title: 'Fase', dataIndex: 'fase', width: 120, render: (text) => {
+            const valorReal = text?.descricao || text;
+            const encontrado = FASE_PROCESSO_OPTIONS.find(o => o.value === valorReal || o.label === valorReal);
+            return encontrado ? encontrado.label : (valorReal || '-');
+        }},
+
         { title: 'Prazo', dataIndex: 'dataPrazo', width: 100, render: (text) => text ? dayjs(text).format('DD/MM/YYYY') : '-' },
-        { title: '', width: 60, fixed: 'right', render: (_, record) => ( <Button type="link" icon={<MoreOutlined />} onClick={() => handleViewDetails(record)} style={{ color: '#8b1a4a' }} /> ),},
+        
+        { title: '', width: 60, fixed: 'right', render: (_, record) => ( 
+            <Button type="link" icon={<MoreOutlined />} onClick={() => handleViewDetails(record)} style={{ color: '#8b1a4a' }} /> 
+        ),},
+        
     ];
     
     return (
@@ -889,7 +942,7 @@ function ProcessosLista() {
             <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 1000 }} size="small" style={{ marginTop: 16 }} />
                 
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                 Total: {pagination.total} processo{pagination.total !== 1 ? 's' : ''}
+                Total: {pagination.total} processo{pagination.total !== 1 ? 's' : ''}
             </div>
 
         </Card>

@@ -9,6 +9,9 @@ import ClientesAniversariantes from './pages/Clientes/ClientesAniversariantes';
 import ProcessosDashboard from './pages/Processos/ProcessosDashboard';
 import ProcessosLista from './pages/Processos/ProcessoLista';
 import ProcessosPrazos from './pages/Processos/ProcessosPrazos';
+import AudienciasDashboard from './pages/Audiencias/AudienciasDashboard';
+import AudienciaLista from './pages/Audiencias/AudienciaLista';
+import GoogleCallback from './pages/GoogleCallback';
 
 function App() {
   
@@ -18,23 +21,36 @@ function App() {
   useEffect(() => {
     
     const token = localStorage.getItem('token');
-    
-    if (!token) {
-      setIsAuthenticated(false);
-    } else {
-      setIsAuthenticated(true);
-    }
-  
+    setIsAuthenticated(!!token);
+
     const handleLogout = () => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       setIsAuthenticated(false);
       navigate('/login');
+      window.location.reload();
+    };
+
+    window.addEventListener('auth:logout', handleLogout);
+    
+    const interval = setInterval(() => {
+      
+      const currentToken = localStorage.getItem('token');
+      
+      if (currentToken && !token) {
+        setIsAuthenticated(true);
+      } else if (!currentToken && token) {
+        setIsAuthenticated(false);
+        navigate('/login');
+      }
+
+    }, 5000);
+    
+    return () => {
+      window.removeEventListener('auth:logout', handleLogout);
+      clearInterval(interval);
     };
   
-    window.addEventListener('auth:logout', handleLogout);
-    return () => window.removeEventListener('auth:logout', handleLogout);
-
   }, [navigate]);
 
   if (!isAuthenticated) {
@@ -48,7 +64,8 @@ function App() {
       <Routes>
 
         <Route path="/login" element={<Navigate to="/" />} />
-        <Route path="/" element={<Navigate to="/dashboard" />} />   
+        <Route path="/" element={<Navigate to="/dashboard" />} /> 
+        <Route path="/callback/google" element={<GoogleCallback /> } />  
 
         <Route path="/clientes/dashboard" element={<ClientesDashboard />} />
         <Route path="/clientes/lista" element={<ClientesLista />} />
@@ -57,6 +74,9 @@ function App() {
         <Route path="/processos/dashboard" element={<ProcessosDashboard /> } />
         <Route path="/processos/lista" element={<ProcessosLista /> } />
         <Route path="/processos/prazos" element={<ProcessosPrazos /> } />
+
+        <Route path="/audiencias/dashboard" element={<AudienciasDashboard /> } />
+        <Route path="/audiencias/lista" element={<AudienciaLista /> } />
         
       </Routes>
       

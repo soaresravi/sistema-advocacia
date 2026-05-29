@@ -313,6 +313,7 @@ public class PericiaResource {
         response.diasAteEvento = entity.getDiasAteEvento();
         response.createdAt = entity.createdAt;
         response.updatedAt = entity.updatedAt;
+        response.googleEventId = entity.googleEventId;
 
         return response;
 

@@ -23,7 +23,7 @@ function ProcessosPrazos() {
       title: null,
       description: message,
       placement: 'bottomRight',
-      duration: 3,
+      duration: 10,
       showProgress: true,
       pauseOnHover: false,
       closable: true,

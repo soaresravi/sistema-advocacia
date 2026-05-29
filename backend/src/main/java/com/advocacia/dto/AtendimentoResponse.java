@@ -17,4 +17,5 @@ public class AtendimentoResponse {
     public BigDecimal valorConsulta;
     public String observacoes;
     public LocalDateTime createdAt, updatedAt;    
+    public String googleEventId;
 }

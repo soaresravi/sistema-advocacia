@@ -22,11 +22,11 @@ body {
 }
 
 .ant-menu-dark .ant-menu-item:hover, .ant-menu-dark .ant-menu-submenu-title:hover {
-  background: linear-gradient(rgba(0, 0, 0, 0.3) ) !important;
+  background: linear-gradient(rgba(0, 0, 0, 0.3)) !important;
 }
 
 .ant-menu-dark .ant-menu-item-selected {
-  background: linear-gradient(rgba(0, 0, 0, 0.3) ) !important;
+  background: linear-gradient(rgba(0, 0, 0, 0.3)) !important;
   color: #fff !important;
 }
 
@@ -89,29 +89,18 @@ body {
   background-color: #8b1a4a !important;
 }
 
-.recharts-surface {
-  transition: width 0.2s ease-in-out, height 0.2s ease-in-out !important;
-}
-
-.recharts-wrapper {
-  transition: width 0.2s ease-in-out, height 0.2s ease-in-out !important;
-}
-
-.ant-layout-content {
-  transition: margin 0.2s ease-in-out, padding 0.2s ease-in-out !important;
+.recharts-surface, .recharts-wrapper, .ant-layout-content {
+  transition: width 0.2s ease-in-out, height 0.2s ease-in-out, margin 0.2s ease-in-out, padding 0.2s ease-in-out !important;
 }
 
 .ant-tabs-ink-bar {
   background: #4e0c1e !important;
 }
 
-.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #4e0c1e !important;
-}
-
 .ant-table-thead > tr > th {
   color: #4e0c1e !important;
 }
+
 .ant-pagination-item-active {
   border-color: #4e0c1e !important;
 }
@@ -170,23 +159,79 @@ body {
   color: #4e0c1e !important;
 }
 
-.ant-input-affix-wrapper:focus, .ant-input-affix-wrapper-focused, .ant-input-affix-wrapper:hover {
-  border-color: #4e0c1e !important;
+.ant-picker-range .ant-picker-active-bar {
+  background: #4e0c1e !important;
+  margin: 10px;
 }
 
-textarea.ant-input:hover, .ant-input-textarea textarea:hover {
-  border-color: #4e0c1e !important;
+.ant-picker-ok button {
+  background: #4e0c1e !important;
 }
 
-textarea.ant-input:focus, .ant-input-textarea textarea:focus {
+.ant-picker-ok button:hover {
+  background: #8b1a4a !important;
+}
+
+.ant-picker-now-btn {
+  color: #4e0c1e !important;
+}
+
+.ant-picker-now-btn:hover {
+  color: #8b1a4a !important;
+}
+
+.ant-picker-time-panel-cell-inner:hover {
+  background: #f5eef0 !important;
+}
+
+.ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+  background: #4e0c1e !important;
+  color: #fff !important;
+}
+
+.ant-picker-time-panel {
+  width: 200px !important;
+  margin-bottom: 5px;
+}
+
+.ant-picker-time-panel-cell-inner {
+  font-size: 14px !important;
+  text-align: center !important;
+  padding: 5px 10px !important;
+  margin: 0 auto !important;
+  width: 80px !important;
+  display: inline-block !important;
+  border-radius: 20px !important;
+}
+
+.ant-select, .ant-input, .ant-input-affix-wrapper, .ant-picker {
+
+  --ant-select-hover-border-color: #4e0c1e !important;
+  --ant-select-active-border-color: #4e0c1e !important;
+  --ant-select-focus-border-color: #4e0c1e !important;
+  
+  --ant-input-hover-border-color: #4e0c1e !important;
+  --ant-input-active-border-color: #4e0c1e !important;
+  --ant-input-focus-border-color: #4e0c1e !important;
+
+  --ant-picker-hover-border-color: #4e0c1e !important;
+  --ant-picker-active-border-color: #4e0c1e !important;
+  --ant-picker-focus-border-color: #4e0c1e !important;
+
+  --ant-select-active-outline-color: rgba(78, 12, 30, 0.12) !important;
+  --ant-input-active-outline-color: rgba(78, 12, 30, 0.12) !important;
+  --ant-picker-active-outline-color: rgba(78, 12, 30, 0.12) !important;
+
+  --ant-control-outline: rgba(78, 12, 30, 0.12) !important;
+
+}
+
+.ant-select-focused .ant-select-selector, .ant-select-selector:focus, .ant-select-selector:active, .ant-input:focus, .ant-input-focused, .ant-input-affix-wrapper-focused, .ant-input-affix-wrapper:focus, .ant-picker-focused, .ant-picker:focus {
   border-color: #4e0c1e !important;
+  box-shadow: 0 0 0 2px rgba(78, 12, 30, 0.12) !important;
   outline: none !important;
 }
 
-.ant-picker:hover, .ant-picker-focused, .ant-picker-range:hover, .ant-picker-range-focused {
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector, .ant-input:not(.ant-input-disabled):hover, .ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover, .ant-picker:not(.ant-picker-disabled):hover {
   border-color: #4e0c1e !important;
-}
-
-.ant-picker-range .ant-picker-active-bar {
-  background: #4e0c1e !important;
 }

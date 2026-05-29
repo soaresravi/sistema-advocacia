@@ -294,7 +294,8 @@ public class AtendimentoResource {
         response.observacoes = entity.observacoes;
         response.createdAt = entity.createdAt;
         response.updatedAt = entity.updatedAt;
-
+        response.googleEventId = entity.googleEventId;
+        
         return response;
 
     }

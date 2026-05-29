@@ -13,4 +13,5 @@ public class PericiaResponse {
     public String processoNumero, detalhes, local, observacoes;
     public Long diasAteEvento;
     public LocalDateTime createdAt, updatedAt;
+    public String googleEventId;
 }

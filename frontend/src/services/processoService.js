@@ -1,4 +1,4 @@
-import api from '../services/api';
+import api from './api';
 
 export const getProcessos = async (page = 0, size = 10, filters = {}) => {
     const params = { page, size, ...filters, };

@@ -13,4 +13,5 @@ public class AudienciaResponse {
     public String processoNumero, detalhes, local, observacoes;
     public Long diasAteEvento;
     public LocalDateTime createdAt, updatedAt;
+    public String googleEventId;
 }
