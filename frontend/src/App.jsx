@@ -12,6 +12,8 @@ import ProcessosPrazos from './pages/Processos/ProcessosPrazos';
 import AudienciasDashboard from './pages/Audiencias/AudienciasDashboard';
 import AudienciaLista from './pages/Audiencias/AudienciaLista';
 import GoogleCallback from './pages/GoogleCallback';
+import PericiasDashboard from './pages/Pericias/PericiasDashboard';
+import PericiaLista from './pages/Pericias/PericiaLista';
 
 function App() {
   
@@ -77,6 +79,9 @@ function App() {
 
         <Route path="/audiencias/dashboard" element={<AudienciasDashboard /> } />
         <Route path="/audiencias/lista" element={<AudienciaLista /> } />
+        
+        <Route path="/pericias/dashboard" element={<PericiasDashboard /> } />
+        <Route path="/pericias/lista" element={<PericiaLista /> } />
         
       </Routes>
       

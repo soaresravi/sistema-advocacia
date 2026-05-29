@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Spin, Table, Select, message, Badge, Space, Tooltip } from 'antd';
-import { CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, WarningOutlined, GoogleOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Statistic, Spin, Table, Select, message, Badge, Space } from 'antd';
+import { CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { getAudienciasDashboard, getAudienciasHoje, getAudienciasProximos } from '../../services/audienciaService';
 import GraficoLinha from '../../components/Graficos/GraficoLinha';
 

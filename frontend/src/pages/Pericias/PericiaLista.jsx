@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Table, Input, Button, Space, Modal, Form, Select, Row, Col, Card, DatePicker, notification, Tooltip, TimePicker } from 'antd';
 import { SearchOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined, MoreOutlined, GoogleOutlined } from '@ant-design/icons';
-import { getAudiencias, createAudiencia, updateAudiencia, deleteAudiencia, getProcessosOptions, getGoogleStatus } from '../../services/audienciaService';
+import { getPericias, createPericia, updatePericia, deletePericia, getProcessosOptions, getGoogleStatus } from '../../services/periciaService';
 import { STATUS_EVENTO_OPTIONS } from '../../constants/enums';
-import '../../components/Layout/AppLayout.css';
+
 import api from '../../services/api';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 
-function AudienciaLista() {
+function PericiaLista() {
 
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -49,7 +49,7 @@ function AudienciaLista() {
     }, [pagination.current, pagination.pageSize, searchText, filtroStatus, filtroDataInicio, filtroDataFim]);
 
     const carregarProcessos = async () => {
-
+        
         try {
             const processos = await getProcessosOptions();
             setProcessosOptions(processos);
@@ -65,7 +65,7 @@ function AudienciaLista() {
 
         try {
 
-            const response = await getAudiencias(pagination.current - 1, pagination.pageSize, {
+            const response = await getPericias(pagination.current - 1, pagination.pageSize, {
                 search: searchText || undefined,
                 status: filtroStatus,
                 dataInicio: filtroDataInicio ? filtroDataInicio.format('YYYY-MM-DD') : undefined,
@@ -89,7 +89,7 @@ function AudienciaLista() {
     };
 
     const handleViewDetails = (record) => {
-        
+
         setEditingItem(record);
         setIsEditMode(false);
         setModalVisible(true);
@@ -131,13 +131,13 @@ function AudienciaLista() {
         if (!editingItem) return;
 
         try {
-            await deleteAudiencia(editingItem.id);
-            showNotification('success', 'Audiência excluída com sucesso!');
+            await deletePericia(editingItem.id);
+            showNotification('success', 'Perícia excluída com sucesso!');
             setModalVisible(false);
             setEditingItem(null);
             carregarDados();
         } catch (error) {
-            showNotification('error', 'Erro ao excluir audiência');
+            showNotification('error', 'Erro ao excluir perícia');
         }
 
     };
@@ -218,11 +218,11 @@ function AudienciaLista() {
             let response;
 
             if (editingItem) {
-                response = await updateAudiencia(editingItem.id, dataToSend);
-                showNotification('success', 'Audiência atualizada e sincronizada com Google Agenda!');
+                response = await updatePericia(editingItem.id, dataToSend);
+                showNotification('success', 'Perícia atualizada e sincronizada com Google Agenda!');
             } else {
-                response = await createAudiencia(dataToSend);
-                showNotification('success', 'Audiência criada e sincronizada com Google Agenda!');
+                response = await createPericia(dataToSend);
+                showNotification('success', 'Perícia criada e sincronizada com Google Agenda!');
             }
 
             setModalVisible(false);
@@ -231,7 +231,7 @@ function AudienciaLista() {
             carregarDados();
 
         } catch (error) {
-            showNotification('error', error.response?.data?.message || 'Erro ao salvar audiência');
+            showNotification('error', error.response?.data?.message || 'Erro ao salvar perícia');
         } finally {
             setModalLoading(false);
         }
@@ -261,7 +261,7 @@ function AudienciaLista() {
     };
 
     const columns = [
-        
+
         { title: 'ID', dataIndex: 'id', width: 70 },
         { title: 'Data', dataIndex: 'data', width: 110, render: (text) => text ? dayjs(text).format('DD/MM/YYYY') : '-' },
         { title: 'Hora', dataIndex: 'hora', width: 80 },
@@ -329,7 +329,7 @@ function AudienciaLista() {
                 </Col>
                 
                 <Col>
-                    <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}> Nova audiência </Button>
+                    <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}> Nova perícia </Button>
                 </Col>
 
             </Row>
@@ -337,12 +337,12 @@ function AudienciaLista() {
             <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 900 }} size="small" style={{ marginTop: 16 }} />
             
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                Total: {pagination.total} audiência{pagination.total !== 1 ? 's' : ''}
+                Total: {pagination.total} perícia{pagination.total !== 1 ? 's' : ''}
             </div>
 
         </Card>
 
-        <Modal title={!editingItem ? 'Nova audiência' : (isEditMode ? 'Editar audiência' : 'Detalhes da audiência')} open={modalVisible} onCancel={handleCancelModal} footer={
+        <Modal title={!editingItem ? 'Nova perícia' : (isEditMode ? 'Editar perícia' : 'Detalhes da perícia')} open={modalVisible} onCancel={handleCancelModal} footer={
             
             !editingItem ? [
                 <Button key="cancel" onClick={handleCancelModal}>Cancelar</Button>,
@@ -371,7 +371,7 @@ function AudienciaLista() {
                 <Button key="edit" type="primary" onClick={handleEnableEdit} style={{ background: '#4e0c1e' }}> <EditOutlined /> Editar informações </Button>,
                 
                 <Button key="delete" danger onClick={() => {
-                    Modal.confirm({ title: 'Excluir audiência', content: 'Tem certeza que deseja excluir esta audiência? Esta ação não pode ser desfeita.', okText: 'Sim, excluir', cancelText: 'Não, cancelar', okButtonProps: { style: { background: '#4e0c1e' }, danger: true }, centered: true, onOk: handleDelete, });
+                    Modal.confirm({ title: 'Excluir perícia', content: 'Tem certeza que deseja excluir esta perícia? Esta ação não pode ser desfeita.', okText: 'Sim, excluir', cancelText: 'Não, cancelar', okButtonProps: { style: { background: '#4e0c1e' }, danger: true }, centered: true, onOk: handleDelete, });
                 }}> <DeleteOutlined /> Excluir </Button>,
 
             ]
@@ -427,4 +427,4 @@ function AudienciaLista() {
     );
 }
 
-export default AudienciaLista;
+export default PericiaLista;
