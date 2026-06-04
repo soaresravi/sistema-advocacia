@@ -387,7 +387,7 @@ function DespesaLista() {
                     <Col span={12}>
                     
                         <Form.Item name="categoria" label="Categoria" rules={[{ required: true }]}>
-                            <Select size="small" options={CATEGORIA_DESPESA_OPTIONS} />
+                            <Select placeholder="Selecione" allowClear showSearch={{ optionFilterProp: "label" }} size="small" options={CATEGORIA_DESPESA_OPTIONS} />
                         </Form.Item>
                     
                     </Col>
