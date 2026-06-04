@@ -1,5 +1,5 @@
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 
 import Login from './pages/Login/Login';
 import AppLayout from './components/Layout/AppLayout.jsx';
@@ -16,24 +16,24 @@ import PericiasDashboard from './pages/Pericias/PericiasDashboard';
 import PericiaLista from './pages/Pericias/PericiaLista';
 import AtendimentosDashboard from './pages/Atendimentos/AtendimentosDashboard';
 import AtendimentoLista from './pages/Atendimentos/AtendimentoLista';
+import FinanceiroDashboard from './pages/Financeiro/FinanceiroDashboard';
+import RecebimentoLista from './pages/Financeiro/RecebimentoLista';
+import DespesaLista from './pages/Financeiro/DespesaLista';
 
 function App() {
   
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    navigate('/login', { replace: true });
+  }, [navigate]);
 
   useEffect(() => {
-    
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token);
-
-    const handleLogout = () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setIsAuthenticated(false);
-      navigate('/login');
-      window.location.reload();
-    };
 
     window.addEventListener('auth:logout', handleLogout);
     
@@ -41,24 +41,43 @@ function App() {
       
       const currentToken = localStorage.getItem('token');
       
-      if (currentToken && !token) {
+      if (!currentToken && isAuthenticated) {
+        handleLogout();
+      } else if (currentToken && !isAuthenticated) {
         setIsAuthenticated(true);
-      } else if (!currentToken && token) {
-        setIsAuthenticated(false);
-        navigate('/login');
       }
 
-    }, 5000);
+    }, 2000);
     
     return () => {
       window.removeEventListener('auth:logout', handleLogout);
       clearInterval(interval);
     };
-  
-  }, [navigate]);
+
+  }, [isAuthenticated, handleLogout]);
+
+  useEffect(() => {
+    
+    const token = localStorage.getItem('token');
+    
+    if (!token && location.pathname !== '/login' && !location.pathname.startsWith('/callback')) {
+      setIsAuthenticated(false);
+      navigate('/login', { replace: true });
+    }
+
+  }, [location.pathname, navigate]);
 
   if (!isAuthenticated) {
-    return <Login onLogin={setIsAuthenticated} />;
+
+    return (
+
+      <Routes>
+        <Route path="/login" element={<Login onLogin={() => setIsAuthenticated(true)} />} />
+        <Route path="/callback/google" element={<GoogleCallback />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+
+    );
   }
 
   return (
@@ -87,6 +106,10 @@ function App() {
 
         <Route path="/atendimentos/dashboard" element={<AtendimentosDashboard /> } />
         <Route path="/atendimentos/lista" element={<AtendimentoLista /> } />
+
+        <Route path="/financeiro/dashboard" element={<FinanceiroDashboard /> } />
+        <Route path="/financeiro/recebimentos" element={<RecebimentoLista /> } />
+        <Route path="/financeiro/despesas" element={<DespesaLista /> } />
         
       </Routes>
       

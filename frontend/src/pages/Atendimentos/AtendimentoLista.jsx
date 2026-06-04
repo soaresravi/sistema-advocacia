@@ -314,7 +314,7 @@ function AtendimentoLista() {
       
     </Card>
   
-    <Modal title={!editingItem ? 'Novo atendimento' : (isEditMode ? 'Editar atendimento' : 'Detalhes do atendimento')} open={modalVisible} onCancel={handleCancelModal} footer={
+    <Modal title={!editingItem ? 'Novo atendimento' : (isEditMode ? 'Editar atendimento' : 'Visualizar atendimento')} open={modalVisible} onCancel={handleCancelModal} footer={
     
     !editingItem ? [
       <Button key="cancel" onClick={handleCancelModal}>Cancelar</Button>,

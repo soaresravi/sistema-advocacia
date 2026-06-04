@@ -342,7 +342,7 @@ function PericiaLista() {
 
         </Card>
 
-        <Modal title={!editingItem ? 'Nova perícia' : (isEditMode ? 'Editar perícia' : 'Detalhes da perícia')} open={modalVisible} onCancel={handleCancelModal} footer={
+        <Modal title={!editingItem ? 'Nova perícia' : (isEditMode ? 'Editar perícia' : 'Visualizar perícia')} open={modalVisible} onCancel={handleCancelModal} footer={
             
             !editingItem ? [
                 <Button key="cancel" onClick={handleCancelModal}>Cancelar</Button>,

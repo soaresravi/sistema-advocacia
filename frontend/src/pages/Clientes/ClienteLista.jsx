@@ -437,7 +437,7 @@ function ClientesLista() {
 
         </Card>
 
-        <Modal title={!editingItem ? `Novo cliente ${activeTab === 'pf' ? 'pessoa física' : 'pessoa jurídica'}` : (isEditMode ? `Editar ${activeTab === 'pf' ? 'Pessoa Física' : 'Pessoa Jurídica'}` : 'Detalhes do cliente')} open={modalVisible} onCancel={handleCancelModal}
+        <Modal title={!editingItem ? `Novo cliente ${activeTab === 'pf' ? 'pessoa física' : 'pessoa jurídica'}` : (isEditMode ? `Editar ${activeTab === 'pf' ? 'Pessoa Física' : 'Pessoa Jurídica'}` : 'Visualizar cliente')} open={modalVisible} onCancel={handleCancelModal}
         
         footer={!editingItem ? [
             

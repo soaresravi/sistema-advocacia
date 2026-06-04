@@ -342,7 +342,7 @@ function AudienciaLista() {
 
         </Card>
 
-        <Modal title={!editingItem ? 'Nova audiência' : (isEditMode ? 'Editar audiência' : 'Detalhes da audiência')} open={modalVisible} onCancel={handleCancelModal} footer={
+        <Modal title={!editingItem ? 'Nova audiência' : (isEditMode ? 'Editar audiência' : 'Visualizar audiência')} open={modalVisible} onCancel={handleCancelModal} footer={
             
             !editingItem ? [
                 <Button key="cancel" onClick={handleCancelModal}>Cancelar</Button>,

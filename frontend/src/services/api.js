@@ -15,29 +15,35 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-
+    
     const token = localStorage.getItem('token');
-
+    
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
-    
-}, (error) => Promise.reject(error) );
+
+}, (error) => Promise.reject(error));
 
 api.interceptors.response.use((response) => response, (error) => {
-
-    const isAuthError = error.response?.status === 401 || error.response?.status === 403;
+    
     const isLoginRequest = error.config?.url?.includes('/auth/login');    
-    const isTokenInvalid = error.response?.data?.message === "Token inválido" || error.response?.data?.message === "Token expirado";
         
-    if ((isAuthError || isTokenInvalid) && !isLoginRequest) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.dispatchEvent(new Event('auth:logout'));
+    if (!isLoginRequest) {
+        
+        const status = error.response?.status;
+        const isAuthError = status === 401 || status === 403;
+        const isNetworkOrCorsError = !error.response && error.message === "Network Error";
+
+        if (isAuthError || isNetworkOrCorsError) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+             window.dispatchEvent(new Event('auth:logout'));
+        }
+
     }
-        
+            
     return Promise.reject(error);
     
 });
