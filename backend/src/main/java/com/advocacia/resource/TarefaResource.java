@@ -2,7 +2,9 @@ package com.advocacia.resource;
 
 import com.advocacia.dto.*;
 import com.advocacia.entity.Tarefa;
+import com.advocacia.entity.User;
 import com.advocacia.enums.*;
+import com.advocacia.service.GoogleCalendarService;
 
 import io.quarkus.panache.common.Page;
 
@@ -17,6 +19,7 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,9 @@ public class TarefaResource {
     
     @Inject
     JsonWebToken jwt;
+
+    @Inject
+    GoogleCalendarService googleCalendarService;
 
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
@@ -104,10 +110,38 @@ public class TarefaResource {
     @Transactional
 
     public Response criar(TarefaRequest request) {
+
         Tarefa entity = new Tarefa();
         entity.userId = getUserId();
         updateEntity(entity, request);
         entity.persist();
+
+        try {
+
+            User user = User.findById(getUserId());
+
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && entity.prazoTarefa != null) {
+
+                LocalTime horarioPadrao = LocalTime.of(9, 0);
+                
+                String titulo = "Tarefa: " + entity.tarefa;
+                String descricao = "Status: " + (entity.status != null ? entity.status.getDescricao() : "") + "\n" + "Urgência: " + (entity.urgencia != null ? entity.urgencia.getDescricao() : "") + "\n" + "Responsável: " + (entity.responsavel != null ? entity.responsavel : "") + "\n" + "Andamento: " + (entity.andamento != null ? entity.andamento : "") + "\n" + "Cliente: " + (entity.clienteNome != null ? entity.clienteNome : "") + "\n" + "Processo: " + (entity.processoNumero != null ? entity.processoNumero : "");
+                String eventId = googleCalendarService.criarEvento(user.googleRefreshToken, user.googleEmail, titulo, descricao, entity.prazoTarefa, horarioPadrao.toString(), 60L);
+
+                entity.googleEventId = eventId;
+                entity.persist();
+                
+            }
+        
+        } catch (Exception e) {
+            System.err.println("Erro ao criar evento no Google Calendar: " + e.getMessage());
+
+            if (e.getMessage() != null && (e.getMessage().contains("invalid_grant") || e.getMessage().contains("expired"))) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", "Google Token Expired")).build());
+            }
+
+        }
+
         return Response.status(Response.Status.CREATED).entity(toResponse(entity)).build();
     }
 
@@ -116,11 +150,54 @@ public class TarefaResource {
     @Transactional
 
     public Response atualizar(@PathParam("id") Long id, TarefaRequest request) {
+
         Tarefa entity = Tarefa.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
         if (entity == null) return Response.status(404).build();
         updateEntity(entity, request);
         entity.persist();
+
+        try {
+
+            User user = User.findById(getUserId());
+
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty()) {
+
+                if (entity.googleEventId != null && entity.prazoTarefa != null) {
+
+                    LocalTime horarioPadrao = LocalTime.of(9, 0);
+                    
+                    String titulo = "Tarefa: " + entity.tarefa;
+                    String descricao = "Status: " + (entity.status != null ? entity.status.getDescricao() : "") + "\n" + "Urgência: " + (entity.urgencia != null ? entity.urgencia.getDescricao() : "") + "\n" + "Responsável: " + (entity.responsavel != null ? entity.responsavel : "") + "\n" + "Andamento: " + (entity.andamento != null ? entity.andamento : "") + "\n" + "Cliente: " + (entity.clienteNome != null ? entity.clienteNome : "") + "\n" + "Processo: " + (entity.processoNumero != null ? entity.processoNumero : "");
+
+                    googleCalendarService.atualizarEvento(user.googleRefreshToken, entity.googleEventId, titulo, descricao, entity.prazoTarefa, horarioPadrao.toString(), 60L);
+                
+                } else if (entity.googleEventId == null && entity.prazoTarefa != null) {
+                    
+                    LocalTime horarioPadrao = LocalTime.of(9, 0);
+                    
+                    String titulo = "Tarefa: " + entity.tarefa;
+                    String descricao = "Status: " + (entity.status != null ? entity.status.getDescricao() : "") + "\n" + "Urgência: " + (entity.urgencia != null ? entity.urgencia.getDescricao() : "") + "\n" + "Responsável: " + (entity.responsavel != null ? entity.responsavel : "") + "\n" + "Andamento: " + (entity.andamento != null ? entity.andamento : "") + "\n" + "Cliente: " + (entity.clienteNome != null ? entity.clienteNome : "") + "\n" + "Processo: " + (entity.processoNumero != null ? entity.processoNumero : "");
+                    String eventId = googleCalendarService.criarEvento(user.googleRefreshToken, user.googleEmail, titulo, descricao, entity.prazoTarefa, horarioPadrao.toString(), 60L);
+
+                    entity.googleEventId = eventId;
+                    entity.persist();
+                    
+                }
+            
+            }
+
+        } catch (Exception e) {
+            
+            System.err.println("Erro ao atualizar evento no Google Calendar: " + e.getMessage());
+            
+            if (e.getMessage() != null && (e.getMessage().contains("invalid_grant") || e.getMessage().contains("expired"))) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", "Google Token Expired")).build());
+            }
+
+        }
+
         return Response.ok(toResponse(entity)).build();
+    
     }
 
     @DELETE
@@ -128,9 +205,35 @@ public class TarefaResource {
     @Transactional
 
     public Response deletar(@PathParam("id") Long id) {
+
+        Tarefa entity = Tarefa.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (entity == null) return Response.status(404).build();
+
+        String googleEventId = entity.googleEventId;
+
+        try {
+
+            User user = User.findById(getUserId());
+
+            if (user.googleRefreshToken != null && !user.googleRefreshToken.isEmpty() && googleEventId != null) {
+                googleCalendarService.deletarEvento(user.googleRefreshToken, googleEventId);
+            }
+
+        } catch (Exception e) {
+
+            System.err.println("Erro ao deletar evento do Google Calendar: " + e.getMessage());
+
+            if (e.getMessage() != null && (e.getMessage().contains("invalid_grant") || e.getMessage().contains("expired"))) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(Map.of("message", "Google Token Expired")).build());
+            }
+
+        }
+
         long deleted = Tarefa.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+
         return Response.noContent().build();
+
     }
 
     @GET
@@ -255,6 +358,7 @@ public class TarefaResource {
         response.diasAtePrazo = entity.getDiasAtePrazo();
         response.createdAt = entity.createdAt;
         response.updatedAt = entity.updatedAt;
+        response.googleEventId = entity.googleEventId;
 
         return response;
 

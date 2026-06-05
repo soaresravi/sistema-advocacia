@@ -221,3 +221,17 @@ export const CATEGORIA_DESPESA_OPTIONS = [
     { value: 'SALARIO_FUNCIONARIO', label: 'Salário de Funcionário' },
     { value: 'TRANSPORTE', label: 'Transporte' },
 ];
+
+export const STATUS_TAREFA_OPTIONS = [
+    { value: 'NAO_INICIADA', label: 'Não iniciada' },
+    { value: 'EM_ANDAMENTO', label: 'Em andamento' },
+    { value: 'CONCLUIDA', label: 'Concluída' },
+];
+
+export const URGENCIA_TAREFA_OPTIONS = [
+    { value: 'EXIGE_ATENCAO_IMEDIATA', label: 'Exige atenção imediata' },
+    { value: 'MUITO_URGENTE', label: 'Muito urgente' },
+    { value: 'REQUER_ATENCAO', label: 'Requer atenção' },
+    { value: 'POUCO_URGENTE', label: 'Pouco urgente' },
+    { value: 'PODE_ESPERAR', label: 'Pode esperar' },
+];

@@ -20,4 +20,5 @@ public class TarefaResponse {
     public Long diasAtePrazo;
     public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
+    public String googleEventId;
 }

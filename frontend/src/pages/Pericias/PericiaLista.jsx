@@ -354,10 +354,23 @@ function PericiaLista() {
                     setIsEditMode(false);
                     
                     if (editingItem) {
+
+                        let statusValue = editingItem.status;
+
+                        if (editingItem.status) {
+                            const descricaoBusca = typeof editingItem.status === 'object' ? editingItem.status.descricao : editingItem.status;
+                            const opcaoencontrada = STATUS_EVENTO_OPTIONS.find(o => o.label === descricaoBusca);
+                            if (opcaoencontrada) statusValue = opcaoencontrada.value;
+                        }
                         
                         form.setFieldsValue({
-                            ...editingItem,
                             data: editingItem.data ? dayjs(editingItem.data) : null,
+                            hora: editingItem.hora ? dayjs(editingItem.hora, 'HH:mm') : null,
+                            status: statusValue,
+                            processoId: editingItem.processoId,
+                            detalhes: editingItem.detalhes,
+                            local: editingItem.local,
+                            observacoes: editingItem.observacoes,
                         });
 
                     }

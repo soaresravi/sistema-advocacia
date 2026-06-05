@@ -27,6 +27,9 @@ public class Tarefa extends PanacheEntity {
     @Column(columnDefinition = "TEXT")
     public String andamento;
 
+    @Column(name = "google_event_id")
+    public String googleEventId;
+
     public Long processoId;
     public String processoNumero, tipoCliente, clienteNome;
     public Long userId;
