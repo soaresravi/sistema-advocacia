@@ -3,7 +3,7 @@ package com.advocacia.resource;
 import com.advocacia.dto.*;
 import com.advocacia.entity.*;
 import com.advocacia.enums.StatusEvento;
-import com.advocacia.service.GoogleCalendarService;
+import com.advocacia.service.*;
 
 import io.quarkus.panache.common.Page;
 
@@ -12,8 +12,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
@@ -34,8 +33,39 @@ public class AudienciaResource {
     @Inject
     GoogleCalendarService googleCalendarService;
 
+    @Inject
+    AtividadeLogService logService;
+    
+    @Context
+    SecurityContext securityContext;
+
+    @Context
+    HttpHeaders httpHeaders;
+
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
+    }
+
+    private String getUserAgent() {
+        return httpHeaders.getHeaderString("User-Agent");
+    }
+
+    private String getClientIp() {
+
+        String ip = httpHeaders.getHeaderString("X-Forwarded-For");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip.split(",")[0].trim();
+        }
+
+        ip = httpHeaders.getHeaderString("X-Real-IP");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip;
+        }
+
+        return null;
+        
     }
 
     @GET
@@ -131,6 +161,7 @@ public class AudienciaResource {
             System.err.println("Erro ao criar evento no Google Calendar: " + e.getMessage());
         }
 
+        logService.registrar(getUserId(), "CREATE", "Audiência", entity.id, "Criou audiência para processo: " + entity.processoNumero, getClientIp(), getUserAgent());
         return Response.status(Response.Status.CREATED).entity(toResponse(entity)).build();
 
     }
@@ -147,6 +178,7 @@ public class AudienciaResource {
         Processo processo = Processo.find("id = ?1 and userId = ?2", request.processoId, getUserId()).firstResult();
         if (processo == null) return Response.status(404).entity(Map.of("error", "Processo não encontrado")).build();
 
+        String processoNumeroAntigo = entity.processoNumero;
         updateEntity(entity, request);
         entity.processoNumero = processo.numeroProcesso;
         entity.persist();
@@ -176,6 +208,7 @@ public class AudienciaResource {
             System.err.println("Erro ao atualizar evento no Google Calendar: " + e.getMessage());
         }
 
+        logService.registrar(getUserId(), "UPDATE", "Audiência", entity.id, "Atualizou audiência: " + processoNumeroAntigo + " -> " + entity.processoNumero, getClientIp(), getUserAgent());
         return Response.ok(toResponse(entity)).build();
 
     }
@@ -190,6 +223,7 @@ public class AudienciaResource {
         if (entity == null) return Response.status(404).build();
 
         String googleEventId = entity.googleEventId;
+        String processoNumero = entity.processoNumero;
 
         long deleted = Audiencia.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
@@ -206,6 +240,7 @@ public class AudienciaResource {
             System.err.println("Erro ao deletar evento do Google Calendar: " + e.getMessage());
         }
 
+        logService.registrar(getUserId(), "DELETE", "Audiência", id, "Excluiu audiência do processo: " + processoNumero, getClientIp(), getUserAgent());
         return Response.noContent().build();
         
     }

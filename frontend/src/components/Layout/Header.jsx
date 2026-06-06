@@ -1,6 +1,8 @@
 import { Layout, Dropdown, Avatar, Space, Typography } from 'antd';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { getCurrentUser } from '../../services/configService';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -8,7 +10,24 @@ const { Text } = Typography;
 function Header() {
  
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [user, setUser] = useState({ nome: '', email: '' });
+
+  useEffect(() => {
+    carregarUsuario();
+  }, []);
+
+  const carregarUsuario = async () => {
+   
+    try {
+      const userData = await getCurrentUser();
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+    } catch (error) {
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      setUser(storedUser);
+    }
+
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');

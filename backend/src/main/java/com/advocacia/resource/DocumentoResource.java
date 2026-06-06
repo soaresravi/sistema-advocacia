@@ -2,15 +2,14 @@ package com.advocacia.resource;
 
 import com.advocacia.dto.DocumentoResponse;
 import com.advocacia.entity.*;
-import com.advocacia.service.DocumentoService;
+import com.advocacia.service.*;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.RestForm;
@@ -38,12 +37,43 @@ public class DocumentoResource {
     
     @Inject
     JsonWebToken jwt;
+
+    @Inject
+    AtividadeLogService logService;
+    
+    @Context
+    SecurityContext securityContext;
+
+    @Context
+    HttpHeaders httpHeaders;
     
     @Inject
     DocumentoService documentoService;
 
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
+    }
+
+    private String getUserAgent() {
+        return httpHeaders.getHeaderString("User-Agent");
+    }
+
+    private String getClientIp() {
+
+        String ip = httpHeaders.getHeaderString("X-Forwarded-For");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip.split(",")[0].trim();
+        }
+
+        ip = httpHeaders.getHeaderString("X-Real-IP");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip;
+        }
+
+        return null;
+        
     }
 
     private byte[] comprimirImagem(InputStream imagemStream, String formato) throws Exception {
@@ -154,7 +184,8 @@ public class DocumentoResource {
             response.tamanho = doc.tamanho;
             response.url = doc.url;
             response.uploadedAt = doc.uploadedAt;
-
+            
+            logService.registrar(getUserId(), "CREATE", "Documento", null, "Upload de documento: " + fileName + " no processo: " + processo.numeroProcesso, getClientIp(), getUserAgent());
             return Response.status(Response.Status.CREATED).entity(response).build();
 
         } catch (Exception e) {
@@ -170,8 +201,11 @@ public class DocumentoResource {
     public Response deletarDocumento(@PathParam("id") Long processoId, @PathParam("uuid") String uuid) {
         Processo processo = Processo.find("id = ?1 and userId = ?2", processoId, getUserId()).firstResult();
         if (processo == null) return Response.status(404).build();
+        Documento doc = documentoService.buscarDocumento(processoId, uuid, getUserId());
+        String nomeDocumento = doc != null ? doc.nome : "desconhecido";
         boolean deleted = documentoService.deletarDocumento(processoId, uuid, getUserId());
         if (!deleted) return Response.status(404).build();
+        logService.registrar(getUserId(), "DELETE", "Documento", null, "Excluiu documento: " + nomeDocumento + " do processo: " + processo.numeroProcesso, getClientIp(), getUserAgent());
         return Response.noContent().build();
     }
 

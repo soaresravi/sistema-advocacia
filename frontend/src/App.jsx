@@ -21,6 +21,7 @@ import RecebimentoLista from './pages/Financeiro/RecebimentoLista';
 import DespesaLista from './pages/Financeiro/DespesaLista';
 import TarefasDashboard from './pages/Tarefas/TarefasDashboard';
 import TarefaLista from './pages/Tarefas/TarefaLista';
+import Configuracoes from './pages/Configuracoes';
 
 function App() {
   
@@ -115,6 +116,8 @@ function App() {
 
         <Route path="/tarefas/dashboard" element={<TarefasDashboard /> } />
         <Route path="/tarefas/lista" element={<TarefaLista /> } />
+
+        <Route path="/configuracoes" element={<Configuracoes /> } />
         
       </Routes>
       

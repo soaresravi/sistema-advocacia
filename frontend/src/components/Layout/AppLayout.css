@@ -235,3 +235,13 @@ body {
 .ant-select:not(.ant-select-disabled):hover .ant-select-selector, .ant-input:not(.ant-input-disabled):hover, .ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover, .ant-picker:not(.ant-picker-disabled):hover {
   border-color: #4e0c1e !important;
 }
+
+.ant-modal-confirm .ant-btn-primary {
+  background-color: #4e0c1e !important;
+  border-color: #4e0c1e !important;
+}
+
+.ant-modal-confirm .ant-btn-primary:hover {
+  background-color: #8b1a4a !important;
+  border-color: #8b1a4a !important;
+}

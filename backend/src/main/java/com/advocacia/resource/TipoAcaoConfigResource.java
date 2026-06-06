@@ -3,14 +3,14 @@ package com.advocacia.resource;
 import com.advocacia.dto.TipoAcaoDTO;
 import com.advocacia.enums.TipoAcao;
 import com.advocacia.entity.TipoAcaoPersonalizado;
+import com.advocacia.service.*;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import java.util.*;
@@ -24,6 +24,38 @@ public class TipoAcaoConfigResource {
     
     @Inject
     JsonWebToken jwt;
+
+    
+    @Inject
+    AtividadeLogService logService;
+    
+    @Context
+    SecurityContext securityContext;
+
+    @Context
+    HttpHeaders httpHeaders;
+
+    private String getUserAgent() {
+        return httpHeaders.getHeaderString("User-Agent");
+    }
+
+    private String getClientIp() {
+
+        String ip = httpHeaders.getHeaderString("X-Forwarded-For");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip.split(",")[0].trim();
+        }
+
+        ip = httpHeaders.getHeaderString("X-Real-IP");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip;
+        }
+
+        return null;
+        
+    }
 
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
@@ -84,8 +116,9 @@ public class TipoAcaoConfigResource {
 
         novo.nome = nome;
         novo.userId = getUserId();
-        
         novo.persist();
+
+        logService.registrar(getUserId(), "CREATE", "TipoAcaoPersonalizado", novo.id, "Criou novo tipo de ação: " + nome, getClientIp(), getUserAgent());
         return Response.status(Response.Status.CREATED).entity(Map.of("id", novo.id, "nome", novo.nome, "isPadrao", false)).build();
     
     }
@@ -95,8 +128,12 @@ public class TipoAcaoConfigResource {
     @Transactional
 
     public Response deletar(@PathParam("id") Long id) {
+        TipoAcaoPersonalizado tipo = TipoAcaoPersonalizado.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (tipo == null) return Response.status(404).build();
+        String nomeTipo = tipo.nome;
         long deleted = TipoAcaoPersonalizado.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+        logService.registrar(getUserId(), "DELETE", "TipoAcaoPersonalizado", id, "Excluiu tipo de ação: " + nomeTipo, getClientIp(), getUserAgent());
         return Response.noContent().build();
     }
 }

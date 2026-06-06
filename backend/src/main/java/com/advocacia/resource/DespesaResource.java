@@ -3,6 +3,7 @@ package com.advocacia.resource;
 import com.advocacia.dto.*;
 import com.advocacia.entity.Despesa;
 import com.advocacia.enums.CategoriaDespesa;
+import com.advocacia.service.*;
 
 import io.quarkus.panache.common.Page;
 
@@ -11,8 +12,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
@@ -30,8 +30,39 @@ public class DespesaResource {
     @Inject
     JsonWebToken jwt;
 
+    @Inject
+    AtividadeLogService logService;
+    
+    @Context
+    SecurityContext securityContext;
+
+    @Context
+    HttpHeaders httpHeaders;
+
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
+    }
+
+    private String getUserAgent() {
+        return httpHeaders.getHeaderString("User-Agent");
+    }
+
+    private String getClientIp() {
+
+        String ip = httpHeaders.getHeaderString("X-Forwarded-For");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip.split(",")[0].trim();
+        }
+
+        ip = httpHeaders.getHeaderString("X-Real-IP");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip;
+        }
+
+        return null;
+        
     }
 
     @GET
@@ -106,6 +137,7 @@ public class DespesaResource {
         entity.userId = getUserId();
         updateEntity(entity, request);
         entity.persist();
+        logService.registrar(getUserId(), "CREATE", "Despesa", entity.id, "Criou despesa: " + entity.despesa + " - Valor: R$ " + entity.valor, getClientIp(), getUserAgent());
         return Response.status(Response.Status.CREATED).entity(toResponse(entity)).build();
     }
 
@@ -116,8 +148,10 @@ public class DespesaResource {
     public Response atualizar(@PathParam("id") Long id, DespesaRequest request) {
         Despesa entity = Despesa.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
         if (entity == null) return Response.status(404).build();
+        String despesaAntiga = entity.despesa;
         updateEntity(entity, request);
         entity.persist();
+        logService.registrar(getUserId(), "UPDATE", "Despesa", entity.id, "Atualizou despesa: " + despesaAntiga + " -> " + entity.despesa, getClientIp(), getUserAgent());
         return Response.ok(toResponse(entity)).build();
     }
 
@@ -126,8 +160,12 @@ public class DespesaResource {
     @Transactional
 
     public Response deletar(@PathParam("id") Long id) {
+        Despesa entity = Despesa.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (entity == null) return Response.status(404).build();
+        String despesaNome = entity.despesa;
         long deleted = Despesa.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+        logService.registrar(getUserId(), "DELETE", "Despesa", id, "Excluiu despesa: " + despesaNome, getClientIp(), getUserAgent());
         return Response.noContent().build();
     }
 

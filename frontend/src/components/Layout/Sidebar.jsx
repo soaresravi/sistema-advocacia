@@ -6,7 +6,7 @@ import './AppLayout.css';
 
 const { Sider } = Layout;
 
-function Sidebar() {
+function Sidebar({ onCollapseChange }) {
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -14,7 +14,14 @@ function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
+    
+    const newState = !collapsed;
+    setCollapsed(newState);
+
+    if (onCollapseChange) {
+      onCollapseChange(newState);
+    }
+
   };
 
   const menuItems = [
@@ -85,7 +92,7 @@ function Sidebar() {
 
   return (
   
-  <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} trigger={null} style={{ background: 'linear-gradient(180deg, #4e0c1e 0%, #350511 100%)', minHeight: '100vh', }} theme="dark">
+    <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} trigger={null} style={{ background: 'linear-gradient(180deg, #4e0c1e 0%, #350511 100%)', height: '100vh', position: 'fixed', left: 0, top: 0, zIndex: 100 }} theme="dark">
     
     <div onClick={toggleCollapsed} style={{ height: 64, margin: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 12, cursor: 'pointer', transition: 'all 0.3s', }}>
       
@@ -97,7 +104,7 @@ function Sidebar() {
     
     </div>
     
-    <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]} defaultOpenKeys={['clientes', 'processos', 'eventos', 'financeiro', 'tarefas', 'atendimentos']} items={menuItems} style={{ background: 'transparent', fontFamily: 'Poppins, sans-serif', }} />
+    <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]} defaultOpenKeys={[]} items={menuItems} style={{ background: 'transparent', fontFamily: 'Poppins, sans-serif', }} />
   
   </Sider>
   );

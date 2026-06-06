@@ -3,6 +3,7 @@ package com.advocacia.resource;
 import com.advocacia.dto.*;
 import com.advocacia.entity.*;
 import com.advocacia.enums.*;
+import com.advocacia.service.AtividadeLogService;
 
 import io.quarkus.panache.common.Page;
 import jakarta.annotation.security.RolesAllowed;
@@ -10,8 +11,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
@@ -29,8 +29,39 @@ public class ClienteResource {
     @Inject
     JsonWebToken jwt;
 
+    @Inject
+    AtividadeLogService logService;
+    
+    @Context
+    SecurityContext securityContext;
+
+    @Context
+    HttpHeaders httpHeaders;
+
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
+    }
+
+    private String getUserAgent() {
+        return httpHeaders.getHeaderString("User-Agent");
+    }
+
+    private String getClientIp() {
+
+        String ip = httpHeaders.getHeaderString("X-Forwarded-For");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip.split(",")[0].trim();
+        }
+
+        ip = httpHeaders.getHeaderString("X-Real-IP");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip;
+        }
+
+        return null;
+        
     }
 
     @GET
@@ -88,6 +119,7 @@ public class ClienteResource {
         cliente.userId = getUserId();
         updateEntity(cliente, request);
         cliente.persist();
+        logService.registrar(getUserId(), "CREATE", "ClientePF", cliente.id, "Criou cliente PF: " + cliente.nome, getClientIp(), getUserAgent());
         return Response.status(Response.Status.CREATED).entity(toResponse(cliente)).build();
     }
 
@@ -98,8 +130,10 @@ public class ClienteResource {
     public Response atualizarPF(@PathParam("id") Long id, ClientePFRequest request) {
         ClientePF cliente = ClientePF.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
         if (cliente == null) return Response.status(404).build();
+        String nomeAntigo = cliente.nome;
         updateEntity(cliente, request);
         cliente.persist();
+        logService.registrar(getUserId(), "UPDATE", "ClientePF", cliente.id, "Atualizou cliente PF: " + nomeAntigo + " -> " + cliente.nome, getClientIp(), getUserAgent());
         return Response.ok(toResponse(cliente)).build();
     }
 
@@ -108,8 +142,12 @@ public class ClienteResource {
     @Transactional
 
     public Response deletarPF(@PathParam("id") Long id) {
+        ClientePF cliente = ClientePF.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (cliente == null) return Response.status(404).build();
+        String nomeCliente = cliente.nome;
         long deleted = ClientePF.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+        logService.registrar(getUserId(), "DELETE", "ClientePF", id, "Excluiu cliente PF: " + nomeCliente, getClientIp(), getUserAgent());
         return Response.noContent().build();
     }
 
@@ -293,6 +331,7 @@ public class ClienteResource {
         cliente.userId = getUserId();
         updateEntity(cliente, request);
         cliente.persist();
+        logService.registrar(getUserId(), "CREATE", "ClientePJ", cliente.id, "Criou cliente PJ: " + cliente.nomeFantasia, getClientIp(), getUserAgent());
         return Response.status(Response.Status.CREATED).entity(toResponse(cliente)).build();
     }
 
@@ -303,8 +342,10 @@ public class ClienteResource {
     public Response atualizarPJ(@PathParam("id") Long id, ClientePJRequest request) {
         ClientePJ cliente = ClientePJ.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
         if (cliente == null) return Response.status(404).build();
+        String nomeAntigo = cliente.nomeFantasia;
         updateEntity(cliente, request);
         cliente.persist();
+        logService.registrar(getUserId(), "UPDATE", "ClientePJ", cliente.id, "Atualizou cliente PJ: " + nomeAntigo + " -> " + cliente.nomeFantasia, getClientIp(), getUserAgent());
         return Response.ok(toResponse(cliente)).build();
     }
 
@@ -313,8 +354,12 @@ public class ClienteResource {
     @Transactional
 
     public Response deletarPJ(@PathParam("id") Long id) {
+        ClientePJ cliente = ClientePJ.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (cliente == null) return Response.status(404).build();
+        String nomeCliente = cliente.nomeFantasia;
         long deleted = ClientePJ.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+        logService.registrar(getUserId(), "DELETE", "ClientePJ", id, "Excluiu cliente PJ: " + nomeCliente, getClientIp(), getUserAgent());
         return Response.noContent().build();
     }
 

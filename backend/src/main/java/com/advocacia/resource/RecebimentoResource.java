@@ -3,6 +3,7 @@ package com.advocacia.resource;
 import com.advocacia.dto.*;
 import com.advocacia.entity.Recebimento;
 import com.advocacia.enums.TipoRecebimento;
+import com.advocacia.service.*;
 
 import io.quarkus.panache.common.Page;
 
@@ -11,11 +12,11 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,6 +30,37 @@ public class RecebimentoResource {
     
     @Inject
     JsonWebToken jwt;
+
+    @Inject
+    AtividadeLogService logService;
+    
+    @Context
+    SecurityContext securityContext;
+
+    @Context
+    HttpHeaders httpHeaders;
+
+    private String getUserAgent() {
+        return httpHeaders.getHeaderString("User-Agent");
+    }
+
+    private String getClientIp() {
+
+        String ip = httpHeaders.getHeaderString("X-Forwarded-For");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip.split(",")[0].trim();
+        }
+
+        ip = httpHeaders.getHeaderString("X-Real-IP");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip;
+        }
+
+        return null;
+        
+    }
 
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
@@ -110,6 +142,7 @@ public class RecebimentoResource {
         entity.userId = getUserId();
         updateEntity(entity, request);
         entity.persist();
+        logService.registrar(getUserId(), "CREATE", "Recebimento", entity.id, "Criou recebimento: R$ " + entity.valor + " - " + entity.tipo.getDescricao() + " - Cliente: " + entity.clienteNome, getClientIp(), getUserAgent());
         return Response.status(Response.Status.CREATED).entity(toResponse(entity)).build();
     }
 
@@ -120,8 +153,11 @@ public class RecebimentoResource {
     public Response atualizar(@PathParam("id") Long id, RecebimentoRequest request) {
         Recebimento entity = Recebimento.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
         if (entity == null) return Response.status(404).build();
+        BigDecimal valorAntigo = entity.valor;
+        String tipoAntigo = entity.tipo != null ? entity.tipo.getDescricao() : "null";
         updateEntity(entity, request);
         entity.persist();
+        logService.registrar(getUserId(), "UPDATE", "Recebimento", entity.id, "Atualizou recebimento: R$ " + valorAntigo + " -> R$ " + entity.valor + " | " + tipoAntigo + " -> " + (entity.tipo != null ? entity.tipo.getDescricao() : "null"), getClientIp(), getUserAgent());
         return Response.ok(toResponse(entity)).build();
     }
 
@@ -130,8 +166,12 @@ public class RecebimentoResource {
     @Transactional
 
     public Response deletar(@PathParam("id") Long id) {
+        Recebimento entity = Recebimento.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (entity == null) return Response.status(404).build();
+        String descricao = "R$ " + entity.valor + " - " + (entity.tipo != null ? entity.tipo.getDescricao() : "sem tipo") + " - Cliente: " + entity.clienteNome;
         long deleted = Recebimento.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+        logService.registrar(getUserId(), "DELETE", "Recebimento", id, "Excluiu recebimento: " + descricao, getClientIp(), getUserAgent());
         return Response.noContent().build();
     }
 

@@ -3,6 +3,7 @@ package com.advocacia.resource;
 import com.advocacia.dto.*;
 import com.advocacia.entity.*;
 import com.advocacia.enums.*;
+import com.advocacia.service.*;
 
 import io.quarkus.panache.common.Page;
 import java.math.BigDecimal;
@@ -11,8 +12,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
@@ -31,6 +31,37 @@ public class ProcessoResource {
     
     @Inject
     JsonWebToken jwt;
+
+    @Inject
+    AtividadeLogService logService;
+    
+    @Context
+    SecurityContext securityContext;
+
+    @Context
+    HttpHeaders httpHeaders;
+
+    private String getUserAgent() {
+        return httpHeaders.getHeaderString("User-Agent");
+    }
+
+    private String getClientIp() {
+
+        String ip = httpHeaders.getHeaderString("X-Forwarded-For");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip.split(",")[0].trim();
+        }
+
+        ip = httpHeaders.getHeaderString("X-Real-IP");
+
+        if (ip != null && !ip.isEmpty()) {
+            return ip;
+        }
+
+        return null;
+        
+    }
 
     private Long getUserId() {
         return Long.parseLong(jwt.getSubject());
@@ -111,6 +142,7 @@ public class ProcessoResource {
         processo.userId = getUserId();
         updateEntity(processo, request);
         processo.persist();
+        logService.registrar(getUserId(), "CREATE", "Processo", processo.id, "Criou processo: " + processo.numeroProcesso + " - Cliente: " + processo.clienteNome, getClientIp(), getUserAgent());
         return Response.status(Response.Status.CREATED).entity(toResponse(processo)).build();
     }
 
@@ -121,8 +153,10 @@ public class ProcessoResource {
     public Response atualizar(@PathParam("id") Long id, ProcessoRequest request) {
         Processo processo = Processo.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
         if (processo == null) return Response.status(404).build();
+        String numeroAntigo = processo.numeroProcesso;
         updateEntity(processo, request);
         processo.persist();
+        logService.registrar(getUserId(), "UPDATE", "Processo", processo.id, "Atualizou processo: " + numeroAntigo + " -> " + processo.numeroProcesso, getClientIp(), getUserAgent());
         return Response.ok(toResponse(processo)).build();
     }
 
@@ -131,8 +165,12 @@ public class ProcessoResource {
     @Transactional
 
     public Response deletar(@PathParam("id") Long id) {
+        Processo processo = Processo.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
+        if (processo == null) return Response.status(404).build();
+        String numeroProcesso = processo.numeroProcesso;
         long deleted = Processo.delete("id = ?1 and userId = ?2", id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+        logService.registrar(getUserId(), "DELETE", "Processo", id, "Excluiu processo: " + numeroProcesso, getClientIp(), getUserAgent());
         return Response.noContent().build();
     }
 
@@ -180,6 +218,7 @@ public class ProcessoResource {
         movimentacao.userId = getUserId();
         movimentacao.persist();
 
+        logService.registrar(getUserId(), "CREATE", "Movimentacao", movimentacao.id, "Adicionou movimentação ao processo: " + processo.numeroProcesso + " - " + request.descricao, getClientIp(), getUserAgent());
         MovimentacaoResponse response = new MovimentacaoResponse();
 
         response.id = movimentacao.id;
@@ -203,6 +242,7 @@ public class ProcessoResource {
         Movimentacao movimentacao = Movimentacao.find("id = ?1 and processoId = ?2 and userId = ?3", movId, id, getUserId()).firstResult();
         if (movimentacao == null) return Response.status(404).build();
 
+        String descricaoAntiga = movimentacao.descricao;
         movimentacao.descricao = request.descricao;
 
         if (request.data != null) {
@@ -210,6 +250,8 @@ public class ProcessoResource {
         }
 
         movimentacao.persist();
+
+        logService.registrar(getUserId(), "UPDATE", "Movimentacao", movimentacao.id, "Atualizou movimentação do processo " + processo.numeroProcesso + ": " + descricaoAntiga + " -> " + request.descricao, getClientIp(), getUserAgent());
         MovimentacaoResponse response = new MovimentacaoResponse();
 
         response.id = movimentacao.id;
@@ -228,8 +270,11 @@ public class ProcessoResource {
     public Response deletarMovimentacao(@PathParam("id") Long id, @PathParam("movId") Long movId) {
         Processo processo = Processo.find("id = ?1 and userId = ?2", id, getUserId()).firstResult();
         if (processo == null) return Response.status(404).build();
+        Movimentacao movimentacao = Movimentacao.find("id = ?1 and processoId = ?2 and userId = ?3", movId, id, getUserId()).firstResult();
+        String descricao = movimentacao != null ? movimentacao.descricao : "desconhecida";
         long deleted = Movimentacao.delete("id = ?1 and processoId = ?2 and userId = ?3", movId, id, getUserId());
         if (deleted == 0) return Response.status(404).build();
+        logService.registrar(getUserId(), "DELETE", "Movimentacao", movId, "Excluiu movimentação do processo " + processo.numeroProcesso + ": " + descricao, getClientIp(), getUserAgent());
         return Response.noContent().build();
     }
 

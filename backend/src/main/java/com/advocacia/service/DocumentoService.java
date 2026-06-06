@@ -14,8 +14,15 @@ public class DocumentoService {
     
     private static final String UPLOAD_BASE_DIR = System.getProperty("user.dir") + "/uploads";
 
-    @Transactional
+    public Path getUserUploadDir(Long userId) {
+        return Paths.get(UPLOAD_BASE_DIR, String.valueOf(userId));
+    }
+    
+    public Path getProcessoUploadDir(Long userId, Long processoId) {
+        return Paths.get(UPLOAD_BASE_DIR, String.valueOf(userId), String.valueOf(processoId));
+    }
 
+    @Transactional
     public Documento salvarArquivo(byte[] conteudo, String nomeArquivo, String contentType, Long userId, Long processoId) throws IOException {
 
         Path userDir = Paths.get(UPLOAD_BASE_DIR, String.valueOf(userId), String.valueOf(processoId));
@@ -53,7 +60,6 @@ public class DocumentoService {
     }
 
     @Transactional
-    
     public boolean deletarDocumento(Long processoId, String uuid, Long userId) {
         
         Documento doc = buscarDocumento(processoId, uuid, userId);
