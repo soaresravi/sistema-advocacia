@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 import Login from './pages/Login/Login';
 import AppLayout from './components/Layout/AppLayout.jsx';
+import DashboardPrincipal from './pages/DashboardPrincipal';
 import ClientesDashboard from './pages/Clientes/ClientesDashboard';
 import ClientesLista from './pages/Clientes/ClienteLista';
 import ClientesAniversariantes from './pages/Clientes/ClientesAniversariantes';
@@ -91,6 +92,7 @@ function App() {
 
         <Route path="/login" element={<Navigate to="/" />} />
         <Route path="/" element={<Navigate to="/dashboard" />} /> 
+        <Route path="/dashboard" element={<DashboardPrincipal /> } />
         <Route path="/callback/google" element={<GoogleCallback /> } />  
 
         <Route path="/clientes/dashboard" element={<ClientesDashboard />} />
