@@ -244,6 +244,7 @@ function Configuracoes() {
         try {
             await updatePerfil(values);
             await carregarDados();
+            window.dispatchEvent(new CustomEvent('user-updated'));
             Modal.success({ content: 'Perfil atualizado com sucesso!', centered: true });
         } catch (error) {
             Modal.error({ content: error.response?.data?.message || 'Erro ao atualizar perfil', centered: true });

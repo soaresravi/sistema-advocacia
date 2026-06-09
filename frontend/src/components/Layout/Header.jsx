@@ -13,7 +13,19 @@ function Header() {
   const [user, setUser] = useState({ nome: '', email: '' });
 
   useEffect(() => {
+    
     carregarUsuario();
+
+    const handleUserUpdate = () => {
+      carregarUsuario();
+    };
+    
+    window.addEventListener('user-updated', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('user-updated', handleUserUpdate);
+    };
+
   }, []);
 
   const carregarUsuario = async () => {

@@ -55,17 +55,17 @@ public class FinanceiroDashboardResource {
             BigDecimal naoRecebido = BigDecimal.ZERO;
             
             for (Recebimento r : todosRecebimentos) {
-
-                if (r.dataPrevistaRecebimento != null && r.dataPrevistaRecebimento.getYear() == anoFiltro &&  r.dataPrevistaRecebimento.getMonthValue() == mes) {
-                    
-                    if (Boolean.TRUE.equals(r.recebido)) {
-                        recebido = recebido.add(r.valor != null ? r.valor : BigDecimal.ZERO);
-                    } else {
-                        naoRecebido = naoRecebido.add(r.valor != null ? r.valor : BigDecimal.ZERO);
-                    }
-
+                
+                if (Boolean.TRUE.equals(r.recebido) && r.dataRecebimento != null 
+                    && r.dataRecebimento.getYear() == anoFiltro && r.dataRecebimento.getMonthValue() == mes) {
+                    recebido = recebido.add(r.valor != null ? r.valor : BigDecimal.ZERO);
                 }
-
+                
+                else if (!Boolean.TRUE.equals(r.recebido) && r.dataPrevistaRecebimento != null 
+                    && r.dataPrevistaRecebimento.getYear() == anoFiltro && r.dataPrevistaRecebimento.getMonthValue() == mes) {
+                    naoRecebido = naoRecebido.add(r.valor != null ? r.valor : BigDecimal.ZERO);
+                }
+            
             }
         
             Map<String, BigDecimal> valores = new HashMap<>();
@@ -87,17 +87,17 @@ public class FinanceiroDashboardResource {
             BigDecimal naoPago = BigDecimal.ZERO;
             
             for (Despesa d : todasDespesas) {
-
-                if (d.dataPrevistaPagamento != null && d.dataPrevistaPagamento.getYear() == anoFiltro &&  d.dataPrevistaPagamento.getMonthValue() == mes) {
-                    
-                    if (Boolean.TRUE.equals(d.pago)) {
-                        pago = pago.add(d.valor != null ? d.valor : BigDecimal.ZERO);
-                    } else {
-                        naoPago = naoPago.add(d.valor != null ? d.valor : BigDecimal.ZERO);
-                    }
-
+                
+                if (Boolean.TRUE.equals(d.pago) && d.dataEfetivaPagamento != null 
+                    && d.dataEfetivaPagamento.getYear() == anoFiltro && d.dataEfetivaPagamento.getMonthValue() == mes) {
+                    pago = pago.add(d.valor != null ? d.valor : BigDecimal.ZERO);
                 }
                 
+                else if (!Boolean.TRUE.equals(d.pago) && d.dataPrevistaPagamento != null 
+                    && d.dataPrevistaPagamento.getYear() == anoFiltro && d.dataPrevistaPagamento.getMonthValue() == mes) {
+                    naoPago = naoPago.add(d.valor != null ? d.valor : BigDecimal.ZERO);
+                }
+            
             }
             
             Map<String, BigDecimal> valores = new HashMap<>();

@@ -81,18 +81,14 @@ public class Processo extends PanacheEntity {
 
     public void calcularTotalHonorarios() {
 
-        BigDecimal calculado = BigDecimal.ZERO;
-
-        if (valorAcordoSentenca != null && honorariosPercentual != null) {
-            calculado = calculado.add(valorAcordoSentenca.multiply(honorariosPercentual.divide(new BigDecimal(100))));
+        if (honorariosReais != null && honorariosReais.compareTo(BigDecimal.ZERO) > 0) {
+            this.totalHonorarios = honorariosReais;
+        } else if (honorariosPercentual != null && valorCausa != null && valorCausa.compareTo(BigDecimal.ZERO) > 0) {
+            this.totalHonorarios = valorCausa.multiply(honorariosPercentual).divide(BigDecimal.valueOf(100));
+        } else {
+            this.totalHonorarios = BigDecimal.ZERO;
         }
-
-        if (honorariosReais != null) {
-            calculado = calculado.add(honorariosReais);
-        }
-
-        this.totalHonorarios = calculado;
-
+        
     }
 
     public void calcularDuracao() {
