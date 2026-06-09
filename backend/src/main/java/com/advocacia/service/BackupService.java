@@ -11,6 +11,7 @@ import java.io.*;
 import java.nio.file.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,7 +54,9 @@ public class BackupService {
         
     }
 
-    private static final String BACKUP_DIR = System.getProperty("user.dir") + "/backups";
+    @ConfigProperty(name = "backups.directory", defaultValue = "/var/www/advocacia/backups")
+    String BACKUP_DIR;
+    
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule()).enable(SerializationFeature.INDENT_OUTPUT);
 
     @Transactional

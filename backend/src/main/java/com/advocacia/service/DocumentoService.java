@@ -4,6 +4,7 @@ import com.advocacia.entity.Documento;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
@@ -12,7 +13,9 @@ import java.util.*;
 
 public class DocumentoService {
     
-    private static final String UPLOAD_BASE_DIR = System.getProperty("user.dir") + "/uploads";
+
+    @ConfigProperty(name = "uploads.directory", defaultValue = "/var/www/advocacia/uploads")
+    String UPLOAD_BASE_DIR;
 
     public Path getUserUploadDir(Long userId) {
         return Paths.get(UPLOAD_BASE_DIR, String.valueOf(userId));
