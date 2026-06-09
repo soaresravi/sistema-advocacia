@@ -64,7 +64,7 @@ function Login({ onLogin }) {
 
         try {
 
-            await api.post('/auth/register', {
+            const response = await api.post('/auth/register', {
                 nome: values.nome,
                 email: values.email,
                 senha: values.password,
