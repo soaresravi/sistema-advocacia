@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Card, Row, Col, Statistic, Spin, Button, Tag, List, Badge, Space, Divider, Alert } from 'antd';
-import { FolderOutlined, TeamOutlined, CalendarOutlined, WarningOutlined, ClockCircleOutlined, DollarOutlined, ArrowUpOutlined, ArrowDownOutlined, ReloadOutlined, GiftOutlined, PhoneOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Statistic, Spin, Button, Tag, List, Space } from 'antd';
+import { FolderOutlined, TeamOutlined, CalendarOutlined, WarningOutlined, ArrowUpOutlined, ArrowDownOutlined, ReloadOutlined, GiftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 import api from '../services/api';
@@ -257,12 +257,12 @@ function DashboardPrincipal() {
                     )}
                 
                 </Space>
-                
-                <List size="small" dataSource={data?.tarefasAtrasadas?.lista?.slice(0, 5)} renderItem={(item) => (
-                
-                    <List.Item>
-                        
-                        <div style={{ width: '100%' }}>
+
+                <div style={{ marginTop: 12 }}>
+                    
+                    {data?.tarefasAtrasadas?.lista?.slice(0, 5).map((item) => (
+                    
+                        <div key={item.id} style={{ padding: '12px 0', borderBottom: '1px solid #f0f0f0', width: '100%'}}>
                             
                             <div style={{ fontWeight: 'bold' }}>{item.tarefa}</div>
                             
@@ -272,9 +272,9 @@ function DashboardPrincipal() {
                         
                         </div>
                     
-                    </List.Item>
+                    ))}
                 
-                )} />
+                </div>
                 
                 {data?.tarefasAtrasadas?.lista?.length > 5 && (
                 
