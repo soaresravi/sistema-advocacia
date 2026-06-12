@@ -10,8 +10,18 @@ function AtendimentosDashboard() {
 
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
     const [contatosHoje, setContatosHoje] = useState([]);
     const [ano, setAno] = useState(new Date().getFullYear());
+    const anoAtual = new Date().getFullYear();
+    const anosOptions = [anoAtual - 3, anoAtual - 2, anoAtual - 1, anoAtual].map(y => ({ value: y, label: y }));
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarDados();
@@ -51,14 +61,14 @@ function AtendimentosDashboard() {
 
     return (
     
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
         
         <Row gutter={[12, 12]} style={{ marginBottom: 20 }}>
             
             <Col xs={12} sm={12} md={8}>
                 
                 <Card size="small">
-                    <Statistic title="Total de atendimentos" value={data?.total || 0} prefix={<TeamOutlined />} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+                    <Statistic title="Total de atendimentos" value={data?.total || 0} prefix={<TeamOutlined />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
             
             </Col>
@@ -66,7 +76,7 @@ function AtendimentosDashboard() {
             <Col xs={12} sm={12} md={8}>
                 
                 <Card size="small">
-                    <Statistic title="Valor total em consultas" value={formatCurrency(data?.totalConsultas)} prefix={<DollarOutlined />} styles={{ content: { color: '#8b1a4a', fontSize: 20 } }} />
+                    <Statistic title="Valor total em consultas" value={formatCurrency(data?.totalConsultas)} prefix={<DollarOutlined />} styles={{ content: { color: '#8b1a4a', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
             
             </Col>
@@ -129,10 +139,10 @@ function AtendimentosDashboard() {
                 
                 <Card size="small">
                     
-                    <GraficoLinha data={data?.porMes} title="Atendimentos por mês" ano={ano} />
+                    <GraficoLinha data={data?.porMes} title="Atendimentos por mês" ano={ano} isMobile={isMobile} />
                     
                     <div style={{ textAlign: 'center', marginTop: 8 }}>
-                        <Select value={ano} onChange={setAno} size="small" style={{ width: 100 }} options={[2023, 2024, 2025, 2026].map(y => ({ value: y, label: y }))} />
+                        <Select value={ano} onChange={setAno} size="small" style={{ width: isMobile ? '80%' : 100 }} options={anosOptions} />
                     </div>
                 
                 </Card>

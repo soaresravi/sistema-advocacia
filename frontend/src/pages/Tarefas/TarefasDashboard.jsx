@@ -9,9 +9,19 @@ function TarefasDashboard() {
 
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
     const [ano, setAno] = useState(new Date().getFullYear());
+    const anoAtual = new Date().getFullYear();
+    const anosOptions = [anoAtual - 3, anoAtual - 2, anoAtual - 1, anoAtual].map(y => ({ value: y, label: y }));
     const [tarefasPorMes, setTarefasPorMes] = useState({});
     const [atrasadasPorUrgencia, setAtrasadasPorUrgencia] = useState([]);
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarDados();
@@ -80,14 +90,14 @@ function TarefasDashboard() {
 
     return (
     
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
 
         <Row gutter={[12, 12]} style={{ marginBottom: 20 }}>
                 
             <Col xs={12} sm={12} md={6}>
 
                 <Card size="small">
-                    <Statistic title="Total de tarefas" value={data?.total || 0} prefix={<UnorderedListOutlined style={{ color: '#4e0c1e' }} />} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+                    <Statistic title="Total de tarefas" value={data?.total || 0} prefix={<UnorderedListOutlined style={{ color: '#4e0c1e' }} />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
             
             </Col>
@@ -95,7 +105,7 @@ function TarefasDashboard() {
             <Col xs={12} sm={12} md={6}>
         
                 <Card size="small">
-                    <Statistic title="Concluídas" value={data?.concluidas || 0} prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+                    <Statistic title="Concluídas" value={data?.concluidas || 0} prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
             
             </Col>
@@ -103,7 +113,7 @@ function TarefasDashboard() {
             <Col xs={12} sm={12} md={6}>
             
                 <Card size="small">
-                    <Statistic title="Não concluídas" value={data?.naoConcluidas || 0} prefix={<ClockCircleOutlined style={{ color: '#faad14' }} />} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+                    <Statistic title="Não concluídas" value={data?.naoConcluidas || 0} prefix={<ClockCircleOutlined style={{ color: '#faad14' }} />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
 
             </Col>
@@ -113,8 +123,8 @@ function TarefasDashboard() {
                 <Card size="small">
                     
                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>Progresso</div>
-                        <Progress type="circle" percent={data?.progresso || 0} size={60} strokeColor="#4e0c1e" format={(percent) => <span style={{ fontSize: 14 }}>{percent}%</span>} />
+                        <div style={{ fontSize: isMobile ? 10 : 12, color: '#888', marginBottom: 4 }}>Progresso</div>
+                        <Progress type="circle" percent={data?.progresso || 0} size={isMobile ? 50 : 60} strokeColor="#4e0c1e" format={(percent) => <span style={{ fontSize: isMobile ? 11 : 14 }}>{percent}%</span>} />
                     </div>
 
                 </Card>
@@ -127,7 +137,7 @@ function TarefasDashboard() {
             
             <Card size="small" style={{ marginBottom: 20 }} title={ <span><WarningOutlined style={{ color: '#ff4d4f', marginRight: 8 }} />Tarefas atrasadas ({atrasadasPorUrgencia.length})</span>}>
                 
-                <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                <div style={{ maxHeight: isMobile ? 250 : 300, overflowY: 'auto' }}>
                     
                     {atrasadasPorUrgencia.map((tarefa, index) => (
                         
@@ -137,9 +147,9 @@ function TarefasDashboard() {
                                 
                                 <Col span={16}>
                                 
-                                    <div style={{ fontWeight: 'bold', fontSize: 13 }}>{tarefa.tarefa}</div>
+                                    <div style={{ fontWeight: 'bold', fontSize: isMobile ? 12 : 13 }}>{tarefa.tarefa}</div>
                                 
-                                    <div style={{ fontSize: 12, color: '#666' }}>
+                                    <div style={{ fontSize: isMobile ? 11 : 12, color: '#666' }}>
                                         Responsável: {tarefa.responsavel || '—'} | Dias de atraso: {tarefa.diasAtraso}
                                     </div>
                                 
@@ -166,10 +176,10 @@ function TarefasDashboard() {
         <Card size="small">
             
             <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                <Select value={ano} onChange={setAno} size="small" style={{ width: 100 }} options={[2023, 2024, 2025, 2026].map(y => ({ value: y, label: y }))} />
+                <Select value={ano} onChange={setAno} size="small" style={{ width: isMobile ? '80%' : 100 }} options={anosOptions} />
             </div>
             
-            <GraficoLinha data={tarefasPorMes} title="Tarefas por mês" ano={ano} />
+            <GraficoLinha data={tarefasPorMes} title="Tarefas por mês" ano={ano} isMobile={isMobile} />
             
         </Card>
 

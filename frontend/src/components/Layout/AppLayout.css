@@ -105,6 +105,24 @@ body {
   border-color: #4e0c1e !important;
 }
 
+@media (max-width: 768px) {
+  
+  .ant-list-pagination {
+    text-align: center;
+    margin-top: 16px;
+  }
+  
+  .ant-pagination-simple .ant-pagination-simple-pager input {
+    border-radius: 6px;
+    border-color: #4e0c1e;
+  }
+  
+  .ant-card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+}
+
 .ant-pagination-item a {
   color: #4e0c1e !important;
 }
@@ -244,4 +262,37 @@ body {
 .ant-modal-confirm .ant-btn-primary:hover {
   background-color: #8b1a4a !important;
   border-color: #8b1a4a !important;
+}
+
+@media (max-width: 768px) {
+ 
+  .ant-statistic-title {
+    font-size: 12px !important;
+  }
+  
+  .ant-statistic-content {
+    font-size: 18px !important;
+  }
+  
+  .ant-card-head-title {
+    font-size: 14px !important;
+  }
+  
+  .ant-btn {
+    font-size: 12px !important;
+    height: 32px !important;
+  }
+  
+  .ant-tag {
+    font-size: 10px !important;
+  }
+  
+  .ant-card-body {
+    padding: 12px !important;
+  }
+  
+  .ant-card {
+    border-radius: 8px !important;
+  }
+
 }

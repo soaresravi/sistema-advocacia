@@ -9,6 +9,14 @@ function GoogleCallback() {
     
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState('success');
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         
@@ -48,7 +56,7 @@ function GoogleCallback() {
         
         return (
             
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', padding: isMobile ? 16 : 0 }}>
                 
                 <Result status="success" title="Permissão concedida!" subTitle="Sua conta do Google foi conectada com sucesso. Agora você pode fechar esta janela e tentar salvar novamente." extra={[
                     <Button type="primary" key="close" onClick={() => window.close()} style={{ background: '#4e0c1e' }}> Fechar esta janela </Button>,
@@ -62,7 +70,7 @@ function GoogleCallback() {
 
     return (
         
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', padding: isMobile ? 16 : 0 }}>
             
             <Result status="error" title="Erro na conexão" subTitle="Ocorreu um erro ao conectar sua conta do Google. Tente novamente." extra={[
                 <Button type="primary" key="close" onClick={() => window.close()} style={{ background: '#4e0c1e' }}> Fechar </Button>,

@@ -7,8 +7,12 @@ import GraficoLinha from '../../components/Graficos/GraficoLinha';
 function FinanceiroDashboard() {
 
     const [loading, setLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
     const [data, setData] = useState(null);
+    
     const [ano, setAno] = useState(new Date().getFullYear());
+    const anoAtual = new Date().getFullYear();
+    const anosOptions = [anoAtual - 3, anoAtual - 2, anoAtual - 1, anoAtual].map(y => ({ value: y, label: y }));
 
     const [recebimentosTotal, setRecebimentosTotal] = useState({});
     const [recebidos, setRecebidos] = useState({});
@@ -17,6 +21,13 @@ function FinanceiroDashboard() {
     const [pagas, setPagas] = useState({});
     const [naoPagas, setNaoPagas] = useState({});
     const [resultadoPorMes, setResultadoPorMes] = useState({});
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarDados();
@@ -101,14 +112,14 @@ function FinanceiroDashboard() {
 
     return (
     
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
         
         <Row gutter={[12, 12]} style={{ marginBottom: 20 }}>
             
             <Col xs={12} sm={12} md={6}>
             
                 <Card size="small">
-                    <Statistic title="Total de recebimentos" value={formatCurrency(data?.totalRecebimentos)} prefix={<ArrowUpOutlined style={{ color: '#52c41a' }} />} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+                    <Statistic title="Total de recebimentos" value={formatCurrency(data?.totalRecebimentos)} prefix={<ArrowUpOutlined style={{ color: '#52c41a' }} />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
 
             </Col>
@@ -116,7 +127,7 @@ function FinanceiroDashboard() {
             <Col xs={12} sm={12} md={6}>
                 
                 <Card size="small">
-                    <Statistic title="Total de despesas" value={formatCurrency(data?.totalDespesas)} prefix={<ArrowDownOutlined style={{ color: '#ff4d4f' }} />} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+                    <Statistic title="Total de despesas" value={formatCurrency(data?.totalDespesas)} prefix={<ArrowDownOutlined style={{ color: '#ff4d4f' }} />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
 
             </Col>
@@ -124,7 +135,7 @@ function FinanceiroDashboard() {
             <Col xs={12} sm={12} md={6}>
                 
                 <Card size="small">
-                    <Statistic title="Resultado" value={formatCurrency(data?.resultado)} prefix={<DollarOutlined />} styles={{ content: { color: data?.resultado >= 0 ? '#52c41a' : '#ff4d4f', fontSize: 20 } }} />
+                    <Statistic title="Resultado" value={formatCurrency(data?.resultado)} prefix={<DollarOutlined />} styles={{ content: { color: data?.resultado >= 0 ? '#52c41a' : '#ff4d4f', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
 
             </Col>
@@ -132,7 +143,7 @@ function FinanceiroDashboard() {
             <Col xs={12} sm={12} md={6}>
                 
                 <Card size="small">
-                    <Statistic title="Recebimentos em atraso" value={formatCurrency(data?.totalRecebimentosAtraso)} prefix={<WalletOutlined />} styles={{ content: { color: '#faad14', fontSize: 20 } }} />
+                    <Statistic title="Recebimentos em atraso" value={formatCurrency(data?.totalRecebimentosAtraso)} prefix={<WalletOutlined />} styles={{ content: { color: '#faad14', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
 
             </Col>
@@ -142,13 +153,13 @@ function FinanceiroDashboard() {
         <Card size="small">
             
             <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                <Select value={ano} onChange={setAno} size="small" style={{ width: 100 }} options={[2023, 2024, 2025, 2026].map(y => ({ value: y, label: y }))} />
+                <Select value={ano} onChange={setAno} size="small" style={{ width: isMobile ? '80%' : 100 }} options={anosOptions} />
             </div>
 
             <Tabs defaultActiveKey="resultado" type="card" size="small" className="custom-tabs" items={[
                 
                 { key: 'resultado', label: 'Resultado geral', children: (
-                    <GraficoLinha data={resultadoPorMes} title="Resultado por mês (receitas - despesas)" ano={ano} cor="#4e0c1e" />
+                    <GraficoLinha data={resultadoPorMes} title="Resultado por mês (receitas - despesas)" ano={ano} cor="#4e0c1e" isMobile={isMobile} />
                 ),},
                 
                 { key: 'recebimentos', label: 'Recebimentos', children: (

@@ -15,7 +15,7 @@ const CustomBar = (props) => {
 
 };
 
-function GraficoBarraHorizontal({ data, title }) {
+function GraficoBarraHorizontal({ data, title, isMobile }) {
 
     const [key, setKey] = useState(0);
 
@@ -49,17 +49,17 @@ function GraficoBarraHorizontal({ data, title }) {
     
     <div style={{ width: '100%', minHeight: chartHeight + 60 }}>
         
-        <h4 style={{ textAlign: 'center', marginBottom: 8, fontSize: 14 }}>{title}</h4>
+        <h4 style={{ textAlign: 'center', marginBottom: 8, fontSize: isMobile ? 12 : 14 }}>{title}</h4>
         
         <div style={{ height: chartHeight }}>
            
             <ResponsiveContainer key={key}>
 
-                <BarChart layout="vertical" data={chartData} margin={{ top: 0, right: 30, left: 100, bottom: 5 }}>
+                <BarChart layout="vertical" data={chartData} margin={{ top: 0, right: isMobile ? 20 : 30, left: isMobile ? 80 : 100, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" tick={{ fontSize: 11 }} />
-                    <YAxis type="category" dataKey="label" width={120} tick={{ fontSize: 11 }} />
-                    <Tooltip formatter={(value, name, props) => [`${value}`, 'Quantidade']} />
+                    <XAxis type="number" tick={{ fontSize: isMobile ? 9 : 11 }} />
+                    <YAxis type="category" dataKey="label" width={isMobile ? 80 : 120} tick={{ fontSize: isMobile ? 9 : 11 }} />
+                    <Tooltip formatter={(value) => [`${value}`, 'Quantidade']} />
                     <Bar dataKey="value" shape={<CustomBar />} />
                 </BarChart>
 
@@ -67,13 +67,13 @@ function GraficoBarraHorizontal({ data, title }) {
 
         </div>
         
-        <div style={{  display: 'flex', justifyContent: 'center',  gap: 16,  marginTop: 16,  marginBottom: 8, flexWrap: 'wrap' }}>
+        <div style={{  display: 'flex', justifyContent: 'center',  gap: isMobile ? 8 : 16,  marginTop: 16,  marginBottom: 8, flexWrap: 'wrap' }}>
             
             {legendItems.map((item) => (
             
-                <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ width: 12, height: 12,  backgroundColor: item.color, borderRadius: 2 }} />
-                    <span style={{ fontSize: 11 }}>{item.label}</span>
+                <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <div style={{ width: 10, height: 10, backgroundColor: item.color, borderRadius: 2 }} />
+                    <span style={{ fontSize: isMobile ? 9 : 11 }}>{item.label}</span>
                 </div>
             ))}
 

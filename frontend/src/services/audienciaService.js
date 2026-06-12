@@ -30,9 +30,14 @@ export const deleteAudiencia = async (id) => {
     await api.delete(`/audiencias/${id}`);
 };
 
-export const getAudienciasDashboard = async () => {
-    const response = await api.get('/audiencias/dashboard');
+export const getAudienciasDashboard = async (ano) => {
+    
+    const response = await api.get('/audiencias/dashboard', {
+        params: { ano }
+    });
+
     return response.data;
+
 };
 
 export const getAudienciasHoje = async () => {

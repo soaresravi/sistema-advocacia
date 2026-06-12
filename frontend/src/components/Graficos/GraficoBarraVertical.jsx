@@ -15,17 +15,17 @@ const CustomBar = (props) => {
 
 };
 
-function GraficoBarraVertical({ data, title }) {
+function GraficoBarraVertical({ data, title, isMobile }) {
 
   const [key, setKey] = useState(0);
 
   useEffect(() => {
 
-      const timeout = setTimeout(() => {
-        setKey(prev => prev + 1);
-      }, 200);
+    const timeout = setTimeout(() => {
+      setKey(prev => prev + 1);
+    }, 200);
 
-      return () => clearTimeout(timeout);
+    return () => clearTimeout(timeout);
 
   }, []);
   
@@ -39,8 +39,6 @@ function GraficoBarraVertical({ data, title }) {
     color: COLORS[index % COLORS.length],
   }));
 
-  const chartHeight = 300;
-
   const legendItems = chartData.map((item) => ({
     label: item.label,
     color: item.color,
@@ -48,18 +46,18 @@ function GraficoBarraVertical({ data, title }) {
 
   return (
   
-  <div style={{ width: '100%', height: chartHeight}}>
+  <div style={{ width: '100%', height: isMobile ? 280 : 300 }}>
     
-    <h4 style={{ textAlign: 'center', marginBottom: 8, fontSize: 14 }}>{title}</h4>
+    <h4 style={{ textAlign: 'center', marginBottom: 8, fontSize: isMobile ? 12 : 14 }}>{title}</h4>
       
-    <div style={{ height: chartHeight }}>
+    <div style={{ height: isMobile ? 200 : 300 }}>
       
       <ResponsiveContainer key={key}>
         
-        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+        <BarChart data={chartData} margin={{ top: 20, right: isMobile ? 10 : 30, left: isMobile ? 10 : 20, bottom: isMobile ? 40 : 60 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="label" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 10 }} />
-          <YAxis tick={{ fontSize: 11 }} />
+          <XAxis dataKey="label" angle={-45} textAnchor="end" height={isMobile ? 40 : 60} tick={{ fontSize: isMobile ? 8 : 10 }} />
+          <YAxis tick={{ fontSize: isMobile ? 9 : 11 }} />
           <Tooltip formatter={(value) => [`${value}`, 'Quantidade']} />
           <Bar dataKey="value" shape={<CustomBar />} />
         </BarChart>
@@ -68,13 +66,13 @@ function GraficoBarraVertical({ data, title }) {
 
     </div>
     
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 16,  flexWrap: 'wrap' , marginTop: -60 }}>
+    <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? 8 : 16, flexWrap: 'wrap', marginTop: isMobile ? -40 : -60 }}>
       
       {legendItems.map((item) => (
         
-        <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 12, height: 12, backgroundColor: item.color, borderRadius: 2 }} />
-          <span style={{ fontSize: 11 }}>{item.label}</span>
+        <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 10, height: 10, backgroundColor: item.color, borderRadius: 2 }} />
+          <span style={{ fontSize: isMobile ? 9 : 11 }}>{item.label}</span>
         </div>
 
       ))}

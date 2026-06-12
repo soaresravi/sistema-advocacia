@@ -12,6 +12,7 @@ const { Text } = Typography;
 function Configuracoes() {
 
     const [loading, setLoading] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [user, setUser] = useState(null);
     const [googleConnected, setGoogleConnected] = useState(false);
     const [googleEmail, setGoogleEmail] = useState('');
@@ -30,6 +31,13 @@ function Configuracoes() {
     const showNotification = (type, message) => {
         Modal[type === 'success' ? 'success' : 'error']({ content: message, centered: true });
     };
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarDados();
@@ -345,7 +353,7 @@ function Configuracoes() {
 
     return (
     
-    <div style={{ padding: 24, maxWidth: 800, margin: '0 auto' }}>
+    <div style={{ padding: isMobile ? 16 : 24, maxWidth: 800, margin: '0 auto' }}>
         
         <Card title={<span style={{ color: '#4e0c1e' }}> Perfil </span>} style={{ marginBottom: 24 }}>
     
@@ -441,11 +449,11 @@ function Configuracoes() {
 
         <Card title={<span style={{ color: '#4e0c1e' }}>Log de atividades</span>} style={{ marginBottom: 24, marginTop: 24 }}>
             
-            <Table dataSource={logs} rowKey="id" loading={logsLoading} pagination={logsPagination} onChange={(pagination) => carregarLogs(pagination.current - 1, pagination.pageSize)} size="small" columns={[
+            <Table dataSource={logs} scroll={{ x: isMobile ? 500 : undefined }} rowKey="id" loading={logsLoading} pagination={logsPagination} onChange={(pagination) => carregarLogs(pagination.current - 1, pagination.pageSize)} size="small" columns={[
                 
-                { title: 'Data/Hora', dataIndex: 'createdAt', width: 160, render: (text) => dayjs(text).format('DD/MM/YYYY HH:mm:ss') },
-                { title: 'Ação', dataIndex: 'acao', width: 100 },
-                { title: 'Entidade', dataIndex: 'entidade', width: 120 },
+                { title: 'Data/Hora', dataIndex: 'createdAt', width: isMobile ? 140 : 160, render: (text) => dayjs(text).format('DD/MM/YYYY HH:mm:ss') },
+                { title: 'Ação', dataIndex: 'acao', width: isMobile ? 80 : 100 },
+                { title: 'Entidade', dataIndex: 'entidade', width: isMobile ? 100 : 120 },
                 { title: 'Descrição', dataIndex: 'descricao', ellipsis: true },
             ]} />
             
@@ -457,51 +465,34 @@ function Configuracoes() {
         
         <Card title={<span style={{ color: '#4e0c1e' }}>Backup e restauração</span>}>
             
-            <Row gutter={16}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 16 }}>
                 
-                <Col span={12}>
+                <div style={{ flex: 1, textAlign: 'center', padding: isMobile ? 12 : 20 }}>
+                    <Button type="primary" icon={<DownloadOutlined />} onClick={fazerBackup} loading={backupLoading} style={{ background: '#4e0c1e', width: isMobile ? '100%' : 'auto', marginBottom: 16 }}> Baixar backup </Button>
+                    <p style={{ fontSize: 12, color: '#666' }}> Exporta todos os seus dados (clientes, processos, finanças, etc.) em um arquivo ZIP. </p>
+                </div>
+                
+                <div style={{ flex: 1, textAlign: 'center', padding: isMobile ? 0 : 20 }}>
                     
-                    <div style={{ textAlign: 'center', padding: 20 }}>
-                        <Button type="primary" icon={<DownloadOutlined />} onClick={fazerBackup} loading={backupLoading} style={{ background: '#4e0c1e', marginBottom: 16 }}> Baixar backup </Button>
-                        <p style={{ fontSize: 12, color: '#666' }}> Exporta todos os seus dados (clientes, processos, finanças, etc.) em um arquivo ZIP. </p>
-                    </div>
-                
-                </Col>
-                
-                <Col span={12}>
+                    <Upload accept=".zip" showUploadList={false} beforeUpload={restaurarBackup} customRequest={() => {}}>
+                        <Button icon={<UploadOutlined />} style={{ borderColor: '#faad14', color: '#faad14', width: isMobile ? '100%' : 'auto', marginBottom: 16 }} loading={restoreLoading}> Restaurar backup </Button>
+                    </Upload>
                     
-                    <div style={{ textAlign: 'center', padding: 20 }}>
-                        
-                        <Upload accept=".zip" showUploadList={false} beforeUpload={restaurarBackup} customRequest={() => {}}>
-                            <Button icon={<UploadOutlined />} style={{ borderColor: '#faad14', color: '#faad14', marginBottom: 16 }} loading={restoreLoading}> Restaurar backup </Button>
-                        </Upload>
-                        
-                        <p style={{ fontSize: 12, color: '#666' }}> Restaura dados a partir de um backup anterior. <strong>Cuidado:</strong> substitui dados atuais! </p>
-                    
-                    </div>
+                    <p style={{ fontSize: 12, color: '#666' }}> Restaura dados a partir de um backup anterior. <strong>Cuidado:</strong> substitui dados atuais! </p>
                 
-                </Col>
+                </div>
             
-            </Row>
+            </div>
+        
         </Card>
-
+        
         <Card title={<span style={{ color: '#4e0c1e' }}>Exportar dados (CSV)</span>} style={{ marginTop: 24 }}>
             
-            <Row gutter={16}>
-                
-                <Col span={8}>
-                    <Button icon={<FileTextOutlined />} onClick={() => exportarCSV('clientes')} style={{ width: '100%' }}> Clientes </Button>
-                </Col>
-                
-                <Col span={8}>
-                    <Button icon={<FileTextOutlined />} onClick={() => exportarCSV('processos')} style={{ width: '100%' }}> Processos </Button>
-                </Col>
-                
-                <Col span={8}>
-                    <Button icon={<FileTextOutlined />} onClick={() => exportarCSV('financeiro')} style={{ width: '100%' }}> Financeiro </Button>
-                </Col>
-            
-            </Row>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 16, justifyContent: 'center', alignItems: 'center' }}>
+                <Button icon={<FileTextOutlined />} onClick={() => exportarCSV('clientes')} style={{ width: isMobile ? '100%' : 'auto' }}> Clientes </Button>
+                <Button icon={<FileTextOutlined />} onClick={() => exportarCSV('processos')} style={{ width: isMobile ? '100%' : 'auto' }}> Processos </Button>
+                <Button icon={<FileTextOutlined />} onClick={() => exportarCSV('financeiro')} style={{ width: isMobile ? '100%' : 'auto' }}> Financeiro </Button>
+            </div>
             
             <div style={{ marginTop: 16, textAlign: 'center' }}>
                 <Text type="secondary" style={{ fontSize: 12 }}> Exporta os dados em formato CSV para abrir no Excel ou Google Sheets </Text>
@@ -509,9 +500,9 @@ function Configuracoes() {
         
         </Card>
         
-        <div style={{ marginTop: 24, backgroundColor: '#fff1f0', border: '1px solid #ffccc7', borderRadius: 8, padding: '16px', textAlign: 'center' }}>
-            <Button danger icon={<DeleteOutlined />} onClick={handleDeleteConta} loading={loading} size="large" style={{ backgroundColor: '#ff4d4f', borderColor: '#ff4d4f', color: '#fff', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}> Excluir minha conta </Button> 
-            <p style={{ fontSize: 12, color: '#ff4d4f', marginTop: 12, marginBottom: 0, fontWeight: 500 }}> ATENÇÃO: Esta ação é irreversível. Todos os seus dados serão permanentemente excluídos. </p>
+        <div style={{ marginTop: 24, backgroundColor: '#fff1f0', border: '1px solid #ffccc7', borderRadius: 8, padding: isMobile ? 12 : 16, textAlign: 'center' }}>
+            <Button danger icon={<DeleteOutlined />} onClick={handleDeleteConta} loading={loading} size={isMobile ? 'middle' : 'large'} style={{ backgroundColor: '#ff4d4f', borderColor: '#ff4d4f', color: '#fff', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', width: isMobile ? '100%' : 'auto' }}> Excluir minha conta </Button> 
+            <p style={{ fontSize: isMobile ? 11 : 12, color: '#ff4d4f', marginTop: 12, marginBottom: 0, fontWeight: 500 }}> ATENÇÃO: Esta ação é irreversível. Todos os seus dados serão permanentemente excluídos. </p>
         </div>
     
     </div>

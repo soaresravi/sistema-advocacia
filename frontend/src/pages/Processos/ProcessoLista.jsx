@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Input, Button, Space, Modal, Form, Select, Tabs, notification, Row, Col, Card, DatePicker, Upload } from 'antd';
+import { Table, Input, Tag, Typography, Button, Space, Modal, Form, Select, Tabs, notification, Row, Col, Card, DatePicker, Upload, Drawer } from 'antd';
 import { SearchOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined, UploadOutlined, DownloadOutlined, FileOutlined, MoreOutlined } from '@ant-design/icons';
 import { getProcessos, createProcesso, updateProcesso, deleteProcesso, getMovimentacoes, createMovimentacao, updateMovimentacao, deleteMovimentacao, getDocumentos, uploadDocumento, deleteDocumento, downloadDocumento, downloadAllDocumentos, getTiposAcao, createTipoAcao } from '../../services/processoService';
 import { getClientesOptions } from '../../services/processoService';
@@ -14,6 +14,8 @@ function ProcessosLista() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+    const [isMobile, setIsMobile] = useState(false);
+    const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false);
 
     const [searchText, setSearchText] = useState('');
     const [filtroStatus, setFiltroStatus] = useState(null);
@@ -68,6 +70,18 @@ function ProcessosLista() {
         'Fase de Contestação': 'CONTESTACAO',
         'Fase de Sentença': 'SENTENCA'
     };
+
+    useEffect(() => {
+        
+        const checkScreen = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    
+    }, []);
 
     useEffect(() => {
         carregarOpcoes();
@@ -482,7 +496,7 @@ function ProcessosLista() {
                 
                 <Row gutter={16}>
             
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="numeroProcesso" label="Nº do processo" rules={[{ required: true }]}>
                             <Input size="small" />
@@ -490,7 +504,7 @@ function ProcessosLista() {
                     
                     </Col>
                     
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="status" label="Status">
                             <Select size="small" options={STATUS_PROCESSO_OPTIONS} />
@@ -498,7 +512,7 @@ function ProcessosLista() {
                     
                     </Col>
                     
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="tipoCliente" label="Tipo de cliente">
                             
@@ -517,7 +531,7 @@ function ProcessosLista() {
 
                 <Row gutter={16}>
                     
-                    <Col span={16}>
+                    <Col xs={12} sm={12} md={16}>
                         
                         <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.tipoCliente !== currentValues.tipoCliente}>
                             
@@ -569,7 +583,7 @@ function ProcessosLista() {
                     
                     </Col>
                     
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="qualificacao" label="Qualificação">
                             <Select size="small" showSearch={{ optionFilterProp: "label", filterOption: (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) }} placeholder="Selecione ou pesquise a qualificação" options={QUALIFICACAO_OPTIONS} />
@@ -581,7 +595,7 @@ function ProcessosLista() {
 
                 <Row gutter={16}>
                     
-                    <Col span={10}>
+                    <Col xs={12} sm={12} md={10}>
                         
                         <Form.Item name="tipoAcao" label="Tipo de ação">
                             
@@ -605,7 +619,7 @@ function ProcessosLista() {
 
                     </Col>
                     
-                    <Col span={6}>
+                    <Col xs={12} sm={12} md={6}>
                         
                         <Form.Item name="prazoAberto" label="Prazo aberto?">
                             <Select size="small" options={[{ value: true, label: 'Sim' }, { value: false, label: 'Não' }]} />
@@ -613,7 +627,7 @@ function ProcessosLista() {
                         
                     </Col>
                     
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="dataPrazo" label="Data do prazo">
                             <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" size="small" />
@@ -625,7 +639,7 @@ function ProcessosLista() {
 
                 <Row gutter={16}>
                     
-                    <Col span={12}>
+                    <Col xs={12} sm={12}>
                         
                         <Form.Item name="outroEnvolvido" label="Outro envolvido">
                             <Input size="small" />
@@ -633,7 +647,7 @@ function ProcessosLista() {
                     
                     </Col>
                 
-                    <Col span={12}>
+                    <Col xs={12} sm={12}>
                         
                         <Form.Item name="qualificacaoOutro" label="Qualificação do outro">
                             <Select size="small" showSearch={{ optionFilterProp: "label", filterOption: (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) }} placeholder="Selecione ou pesquise a qualificação" options={QUALIFICACAO_OPTIONS} />
@@ -645,7 +659,7 @@ function ProcessosLista() {
     
                 <Row gutter={16}>
                     
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="valorCausa" label="Valor da causa">
                             <Input type="number" size="small" />
@@ -653,7 +667,7 @@ function ProcessosLista() {
                     
                     </Col>
                 
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="valorAcordoSentenca" label="Valor do acordo">
                             <Input type="number" size="small" />
@@ -661,7 +675,7 @@ function ProcessosLista() {
                     
                     </Col>
                 
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="honorariosPercentual" label="Honorários (%)">
                             <Input type="number" size="small" />
@@ -673,7 +687,7 @@ function ProcessosLista() {
 
                 <Row gutter={16}>
                     
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="honorariosReais" label="Honorários (R$)">
                             <Input type="number" size="small" />
@@ -681,7 +695,7 @@ function ProcessosLista() {
             
                     </Col>
         
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="sucumbencias" label="Sucumbências">
                             <Input size="small" />
@@ -689,7 +703,7 @@ function ProcessosLista() {
             
                     </Col>
         
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
     
                         <Form.Item name="fase" label="Fase">
                             <Select size="small" options={FASE_PROCESSO_OPTIONS} />
@@ -701,7 +715,7 @@ function ProcessosLista() {
                 
                 <Row gutter={16}>
                     
-                    <Col span={12}>
+                    <Col xs={12} sm={12}>
                 
                         <Form.Item name="instancia" label="Instância">
                             <Select size="small" options={INSTANCIA_OPTIONS} />
@@ -709,7 +723,7 @@ function ProcessosLista() {
     
                     </Col>
 
-                    <Col span={12}>
+                    <Col xs={12} sm={12}>
                         
                         <Form.Item name="resultado" label="Resultado do processo">
                             <Select size="small" options={RESULTADO_PROCESSO_OPTIONS} />
@@ -721,7 +735,7 @@ function ProcessosLista() {
 
                 <Row gutter={16}>
                     
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="comarca" label="Comarca">
                             <Input size="small" />
@@ -729,7 +743,7 @@ function ProcessosLista() {
                 
                     </Col>
         
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
                         
                         <Form.Item name="vara" label="Vara">
                             <Input size="small" />
@@ -737,7 +751,7 @@ function ProcessosLista() {
                     
                     </Col>
                 
-                    <Col span={8}>
+                    <Col xs={12} sm={12} md={8}>
             
                         <Form.Item name="dataInicio" label="Data do início">
                             <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" size="small" />
@@ -749,7 +763,7 @@ function ProcessosLista() {
     
                 <Row gutter={16}>
                     
-                    <Col span={12}>
+                    <Col xs={12} sm={12}>
                 
                         <Form.Item name="dataFim" label="Data do fim">
                             <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" size="small" />
@@ -757,7 +771,7 @@ function ProcessosLista() {
                     
                     </Col>
                 
-                    <Col span={12}>
+                    <Col xs={12} sm={12}>
             
                         <Form.Item name="linkProcesso" label="Link do processo">
                             <Input size="small" />
@@ -780,17 +794,17 @@ function ProcessosLista() {
                 {isEditMode && (
                     
                     <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddMov} size="small" style={{ background: '#4e0c1e' }}> Nova Movimentação </Button>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddMov} size={isMobile ? 'middle' : 'small'} style={{ background: '#4e0c1e', fontSize: isMobile ? 12 : 14 }}> Nova Movimentação </Button>
                     </div>
                 
                 )}
                     
-                <Table loading={movLoading} dataSource={movimentacoes} rowKey="id" size="small" pagination={false} columns={[
+                <Table loading={movLoading} dataSource={movimentacoes} rowKey="id" size={isMobile ? 'middle' : 'small'} pagination={false} columns={[
                 
-                { title: 'Data', dataIndex: 'data', width: 120, render: (text) => text ? dayjs(text).format('DD/MM/YYYY') : '-', },
+                { title: 'Data', dataIndex: 'data', width: isMobile ? 90 : 120, render: (text) => text ? dayjs(text).format('DD/MM/YYYY') : '-', },
                 { title: 'Movimentação', dataIndex: 'descricao', },
                 
-                { title: 'Ações', width: 100, render: (_, record) => (
+                { title: 'Ações', width: isMobile ? 80 : 100, render: (_, record) => (
                 
                     <Space>
                         <Button type="link" icon={<EditOutlined />} onClick={() => handleEditMov(record)} style={{ color: '#8b1a4a' }} />
@@ -811,14 +825,14 @@ function ProcessosLista() {
                     
                     <div style={{ marginBottom: 16, textAlign: 'right' }}>
                         
-                        <Space>
+                        <Space wrap size={isMobile ? 'small' : 'middle'}>
                             
                             {documentos.length > 0 && (
-                                <Button icon={<DownloadOutlined />} onClick={handleDownloadAll} size="small"> Baixar todos </Button>
+                                <Button icon={<DownloadOutlined />} onClick={handleDownloadAll} size={isMobile ? 'middle' : 'small'} style={{ fontSize: isMobile ? 12 : 14 }}> Baixar todos </Button>
                             )}
                             
                             <Upload beforeUpload={handleUpload} showUploadList={false} accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx">
-                                <Button type="primary" icon={<UploadOutlined />} loading={uploadLoading} size="small" style={{ background: '#4e0c1e' }}> Enviar documento </Button>
+                                <Button type="primary" icon={<UploadOutlined />} loading={uploadLoading} size={isMobile ? 'middle' : 'small'} style={{ background: '#4e0c1e', fontSize: isMobile ? 12 : 14 }}> Enviar documento </Button>
                             </Upload>
                         
                         </Space>
@@ -827,22 +841,22 @@ function ProcessosLista() {
 
                 )}
     
-                <Table loading={docLoading} dataSource={documentos} rowKey="id" size="small" pagination={false} columns={[
+                <Table loading={docLoading} dataSource={documentos} rowKey="id" size={isMobile ? 'middle' : 'small'} pagination={false} columns={[
                     
                     { title: 'Nome', dataIndex: 'nome', render: (text, record) => (
                         
-                        <Space>
+                        <Space size="small">
                             <FileOutlined style={{ color: '#4e0c1e' }} />
-                            <span>{text}</span>
+                            <span style={{ fontSize: isMobile ? 12 : 14 }}>{text}</span>
                         </Space>
 
                     ), },
                     
-                    { title: 'Tamanho', dataIndex: 'tamanho', width: 100, render: (tamanho) => `${(tamanho / 1024).toFixed(2)} KB`, },
-                    { title: 'Data do upload', dataIndex: 'uploadedAt', width: 150, render: (text) => text ? dayjs(text).format('DD/MM/YYYY HH:mm') : '-', },
-                    { title: 'Ações', width: 100, render: (_, record) => (
+                    { title: 'Tamanho', dataIndex: 'tamanho', width: isMobile ? 80 : 100, render: (tamanho) => `${(tamanho / 1024).toFixed(2)} KB`, },
+                    { title: 'Data do upload', dataIndex: 'uploadedAt', width: isMobile ? 120 : 150, render: (text) => text ? dayjs(text).format('DD/MM/YYYY HH:mm') : '-', },
+                    { title: 'Ações', width: isMobile ? 80 : 100, render: (_, record) => (
                         
-                        <Space>
+                        <Space size={isMobile ? 'small' : 'middle'}>
                             <Button type="link" icon={<DownloadOutlined />} onClick={() => handleDownload(record.id, record.nome)} style={{ color: '#8b1a4a' }} />
                             {isEditMode && ( <Button type="link" danger icon={<DeleteOutlined />} onClick={() => { Modal.confirm({ title: 'Excluir documento', content: 'Tem certeza que deseja excluir este documento? Esta ação não pode ser desfeita.', okText: 'Sim, excluir', cancelText: 'Não, cancelar', okButtonProps: { style: { background: '#4e0c1e' }, danger: true }, centered: true, onOk: () => handleDeleteDoc(record.id), }); }} /> )}
                         </Space>
@@ -891,63 +905,186 @@ function ProcessosLista() {
     
     return (
     
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
         
         <Card size="small">
             
-            <Row gutter={[12, 12]} justify="space-between" align="middle">
+            <Row gutter={[12, 12]} justify="space-between" align="middle" style={{ marginBottom: 16 }}>
                 
-                <Col xs={24} md={16}>
+                {isMobile ? (
+                
+                    <>
+                    
+                        <Space style={{ width: '100%' }} orientation="vertical">              
+                            <Input placeholder="Buscar por nº processo ou cliente" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
+                        </Space>
+                        
+                        <Col xs={24} style={{ textAlign: 'center', marginTop: 8 }}>
+                            <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Novo processo </Button>
+                        </Col>
+
+                    </>
+                    
+                ) : (
+
+                    <>
                     
                     <Space wrap>
-                        
-                        <Input placeholder="Buscar por nº processo ou cliente" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 250 }} prefix={<SearchOutlined />} />
-                        <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_PROCESSO_OPTIONS} />
-                        
-                        <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={setFiltroTipoCliente}
-                        
-                        options={[
-                            { value: 'PF', label: 'Pessoa Física' },
-                            { value: 'PJ', label: 'Pessoa Jurídica' },
-                        ]} />
-                        
-                        <Select placeholder="Prazo aberto?" allowClear style={{ width: 120 }} value={filtroPrazoAberto} onChange={setFiltroPrazoAberto}
-                        
-                        options={[
-                            { value: 'SIM', label: 'Sim' },
-                            { value: 'NAO', label: 'Não' },
-                        ]} />
-                        
-                        <Select placeholder="Fase" allowClear style={{ width: 150 }} value={filtroFase} onChange={setFiltroFase} options={FASE_PROCESSO_OPTIONS} />
-                        
-                        <Button onClick={() => {
-                            setSearchText('');
-                            setFiltroStatus(null);
-                            setFiltroTipoCliente(null);
-                            setFiltroPrazoAberto(null);
-                            setFiltroFase(null);
-                            setPagination({ ...pagination, current: 1 });
+                       
+                       <Input placeholder="Buscar por nº processo ou cliente" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 250 }} prefix={<SearchOutlined />} />
+                       
+                       <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_PROCESSO_OPTIONS} />
+                       <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={setFiltroTipoCliente} options={[{ value: 'PF', label: 'Pessoa Física' }, { value: 'PJ', label: 'Pessoa Jurídica' }]} />
+                       <Select placeholder="Prazo aberto?" allowClear style={{ width: 120 }} value={filtroPrazoAberto} onChange={setFiltroPrazoAberto} options={[{ value: 'SIM', label: 'Sim' }, { value: 'NAO', label: 'Não' }]} />
+                       <Select placeholder="Fase" allowClear style={{ width: 150 }} value={filtroFase} onChange={setFiltroFase} options={FASE_PROCESSO_OPTIONS} />
+                       
+                       <Button onClick={() => {
+                           setSearchText('');
+                           setFiltroStatus(null);
+                           setFiltroTipoCliente(null);
+                           setFiltroPrazoAberto(null);
+                           setFiltroFase(null);
+                           setPagination({ ...pagination, current: 1 });
                         }} icon={<ReloadOutlined />}> Limpar </Button>
-
+                   
                     </Space>
-                
-                </Col>
-                
-                <Col>
+                    
                     <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}> Novo processo </Button>
-                </Col>
+                    
+                    </>
+    
+                )}
             
             </Row>
+
+            {!isMobile && (
+                <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 800 }} size="small" style={{ marginTop: 16 }} />
+            )}
             
-            <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 1000 }} size="small" style={{ marginTop: 16 }} />
-                
+            {isMobile && (
+            
+                <div style={{ marginTop: 16 }}>
+                    
+                    {loading ? (
+                        
+                        <div style={{ textAlign: 'center', padding: '20px' }}>
+                            <span>Carregando...</span>
+                        </div>
+                    
+                    ) : (
+                    
+                        <>
+                        
+                            {data.map((record) => (
+                            
+                                <Card key={record.id} size="small" style={{ marginBottom: 8, borderRadius: 6 }} styles={{ body: { padding: '8px 10px' } }}>
+                                    
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                        <Typography.Text strong style={{ color: '#4e0c1e', fontSize: 13 }}> {record.numeroProcesso || 'Nº não informado'} </Typography.Text>
+                                        <Button type="link" icon={<MoreOutlined />} onClick={() => handleViewDetails(record)} style={{ color: '#4e0c1e', padding: 0, height: 'auto' }} size="small" />
+                                    </div>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                        
+                                        <Col span={12}>
+                                            
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>Status</Typography.Text>
+                                            
+                                            <div>
+                                            
+                                                <Tag color={record.status?.descricao === 'ATIVO' || record.status === 'ATIVO' ? 'green' : 'red'} style={{ fontSize: 10, margin: 0, padding: '0px 6px', lineHeight: '18px' }}>
+                                                    {STATUS_PROCESSO_OPTIONS.find(o => o.value === (record.status?.descricao || record.status))?.label || (record.status?.descricao || record.status || '-')}
+                                                </Tag>
+                                            
+                                            </div>
+                                        
+                                        </Col>
+                                        
+                                        <Col span={12}>
+                                            
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>Fase</Typography.Text>
+                                            
+                                            <div style={{ fontSize: 11, fontWeight: 500 }}>
+                                                {FASE_PROCESSO_OPTIONS.find(o => o.value === (record.fase?.descricao || record.fase))?.label || (record.fase?.descricao || record.fase || '-')}
+                                            </div>
+                                        
+                                        </Col>
+                                    
+                                    </Row>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                        
+                                        <Col span={24}>
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>Cliente</Typography.Text>
+                                            <div style={{ fontSize: 11 }}>{record.clienteNome || '-'}</div>
+                                        </Col>
+                                    
+                                    </Row>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                        
+                                        <Col span={12}>
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>Tipo</Typography.Text>
+                                            <div style={{ fontSize: 11 }}>{record.tipoCliente || '-'}</div>
+                                        </Col>
+                                        
+                                        <Col span={12}>
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>Prazo</Typography.Text>
+                                            <div style={{ fontSize: 11 }}>{record.dataPrazo ? dayjs(record.dataPrazo).format('DD/MM/YYYY') : '-'}</div>
+                                        </Col>
+                                    
+                                    </Row>
+                                    
+                                    {record.valorCausa && (
+                                    
+                                        <Row gutter={[6, 4]}>
+                                            
+                                            <Col span={24}>
+                                                
+                                                <Typography.Text type="secondary" style={{ fontSize: 10 }}>Valor da causa</Typography.Text>
+                                                
+                                                <div style={{ fontSize: 11, fontWeight: 500, color: '#4e0c1e' }}>
+                                                    R$ {record.valorCausa.toLocaleString('pt-BR')}
+                                                </div>
+                                            
+                                            </Col>
+                                        
+                                        </Row>
+                                    
+                                    )}
+                                
+                                </Card>    
+                            ))}
+                            
+                            {pagination.total > 0 && (
+                            
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', marginTop: '12px', padding: '4px' }}>
+                                    
+                                    <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current - 1 })} disabled={pagination.current === 1} style={{ height: '28px', fontSize: '12px' }}> Anterior </Button>
+                                    
+                                    <span style={{ fontSize: 12 }}>
+                                        {pagination.current} / {Math.ceil(pagination.total / pagination.pageSize)}
+                                    </span>
+                                    
+                                    <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current + 1 })} disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)} style={{ height: '28px', fontSize: '12px' }}> Próxima </Button>
+                                
+                                </div>
+                            
+                            )}
+                        
+                        </>
+                    )}
+                </div>
+            )}
+
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
                 Total: {pagination.total} processo{pagination.total !== 1 ? 's' : ''}
             </div>
 
         </Card>
 
-        <Modal title={editingItem ? (isEditMode ? 'Editar processo' : 'Visualizar processo') : 'Novo processo'} open={modalVisible} width={900} onOk={handleModalOk} onCancel={handleCancelModal} okButtonProps={{ style: { background: '#4e0c1e' }, loading: modalLoading }} okText={isEditMode ? (editingItem ? 'Salvar' : 'Criar') : 'Fechar'} cancelText="Cancelar" confirmLoading={modalLoading} mask={{ closable: false }}
+        <Modal title={editingItem ? (isEditMode ? 'Editar processo' : 'Visualizar processo') : 'Novo processo'} open={modalVisible} width={isMobile ? '90%' : 900} onOk={handleModalOk} onCancel={handleCancelModal} okButtonProps={{ style: { background: '#4e0c1e' }, loading: modalLoading }} okText={isEditMode ? (editingItem ? 'Salvar' : 'Criar') : 'Fechar'} cancelText="Cancelar" confirmLoading={modalLoading} mask={{ closable: false }}
         
         footer={
             
@@ -1008,6 +1145,29 @@ function ProcessosLista() {
             </Form>
         
         </Modal>
+
+        <Drawer title={<span style={{ color: '#4e0c1e' }}>Filtros</span>} placement="bottom" onClose={() => setFiltersDrawerOpen(false)} open={filtersDrawerOpen} size="auto">
+            
+            <Space orientation="vertical" style={{ width: '100%' }} size="middle">
+                
+                <Select placeholder="Status" allowClear style={{ width: '100%' }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_PROCESSO_OPTIONS} />
+                <Select placeholder="Tipo de cliente" allowClear style={{ width: '100%' }} value={filtroTipoCliente} onChange={setFiltroTipoCliente} options={[{ value: 'PF', label: 'Pessoa Física' }, { value: 'PJ', label: 'Pessoa Jurídica' }]} />
+                <Select placeholder="Prazo aberto?" allowClear style={{ width: '100%' }} value={filtroPrazoAberto} onChange={setFiltroPrazoAberto} options={[{ value: 'SIM', label: 'Sim' }, { value: 'NAO', label: 'Não' }]} />
+                <Select placeholder="Fase" allowClear style={{ width: '100%' }} value={filtroFase} onChange={setFiltroFase} options={FASE_PROCESSO_OPTIONS} />
+                
+                <Button onClick={() => {
+                    setFiltroStatus(null);
+                    setFiltroTipoCliente(null);
+                    setFiltroPrazoAberto(null);
+                    setFiltroFase(null);
+                    setFiltersDrawerOpen(false);
+                }} style={{ width: '100%' }}> Limpar filtros </Button>
+                
+                <Button type="primary" onClick={() => setFiltersDrawerOpen(false)} style={{ background: '#4e0c1e', width: '100%' }}> Aplicar filtros </Button>
+                
+            </Space>
+            
+        </Drawer>
 
     </div>
     );

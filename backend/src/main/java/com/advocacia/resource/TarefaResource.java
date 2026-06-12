@@ -281,19 +281,20 @@ public class TarefaResource {
         int anoFiltro = ano != null ? ano : LocalDate.now().getYear();
 
         List<Tarefa> todas = Tarefa.list("userId", getUserId());
+        List<Tarefa> filtradas = todas.stream().filter(t -> t.dataCadastro != null && t.dataCadastro.getYear() == anoFiltro).collect(Collectors.toList());
         Map<String, Object> dashboard = new HashMap<>();
 
-        dashboard.put("total", todas.size());
-        dashboard.put("concluidas", todas.stream().filter(t -> t.status == StatusTarefa.CONCLUIDA).count());
-        dashboard.put("naoConcluidas", todas.stream().filter(t -> t.status != StatusTarefa.CONCLUIDA).count());
+        dashboard.put("total", filtradas.size());
+        dashboard.put("concluidas", filtradas.stream().filter(t -> t.status == StatusTarefa.CONCLUIDA).count());
+        dashboard.put("naoConcluidas", filtradas.stream().filter(t -> t.status != StatusTarefa.CONCLUIDA).count());
 
-        long total = todas.size();
-        long concluidas = todas.stream().filter(t -> t.status == StatusTarefa.CONCLUIDA).count();
+        long total = filtradas.size();
+        long concluidas = filtradas.stream().filter(t -> t.status == StatusTarefa.CONCLUIDA).count();
         
         dashboard.put("progresso", total > 0 ? (concluidas * 100 / total) : 0);
         LocalDate hoje = LocalDate.now();
 
-        List<Tarefa> atrasadas = todas.stream().filter(t -> t.prazoTarefa != null && t.prazoTarefa.isBefore(hoje)).filter(t -> t.status != StatusTarefa.CONCLUIDA).collect(Collectors.toList());
+        List<Tarefa> atrasadas = filtradas.stream().filter(t -> t.prazoTarefa != null && t.prazoTarefa.isBefore(hoje)).filter(t -> t.status != StatusTarefa.CONCLUIDA).collect(Collectors.toList());
         Map<String, Long> atrasadasPorUrgencia = new LinkedHashMap<>();
 
         for (UrgenciaTarefa u : UrgenciaTarefa.values()) {
@@ -315,8 +316,8 @@ public class TarefaResource {
 
             final int mesFinal = mes;
 
-            long totalMes = todas.stream().filter(t -> t.dataCadastro != null && t.dataCadastro.getYear() == anoFiltro && t.dataCadastro.getMonthValue() == mesFinal).count();
-            long concluidasMes = todas.stream().filter(t -> t.dataCadastro != null && t.dataCadastro.getYear() == anoFiltro && t.dataCadastro.getMonthValue() == mesFinal).filter(t -> t.status == StatusTarefa.CONCLUIDA).count();
+            long totalMes = filtradas.stream().filter(t -> t.dataCadastro != null && t.dataCadastro.getYear() == anoFiltro && t.dataCadastro.getMonthValue() == mesFinal).count();
+            long concluidasMes = filtradas.stream().filter(t -> t.dataCadastro != null && t.dataCadastro.getYear() == anoFiltro && t.dataCadastro.getMonthValue() == mesFinal).filter(t -> t.status == StatusTarefa.CONCLUIDA).count();
             long naoConcluidasMes = totalMes - concluidasMes;
 
             Map<String, Long> valores = new HashMap<>();

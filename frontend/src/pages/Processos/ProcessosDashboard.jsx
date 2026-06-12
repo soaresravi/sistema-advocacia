@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Row, Col, Statistic, Spin, Tabs } from 'antd';
-import { FolderOutlined, CheckCircleOutlined, CloseCircleOutlined, DollarOutlined, WalletOutlined, TrophyOutlined, BarChartOutlined, PieChartOutlined } from '@ant-design/icons';
+import { FolderOutlined, CheckCircleOutlined, CloseCircleOutlined, WalletOutlined, TrophyOutlined } from '@ant-design/icons';
 import { getProcessosDashboard } from '../../services/processoService';
 import GraficoBarraVertical from '../../components/Graficos/GraficoBarraVertical';
 import GraficoRosca from '../../components/Graficos/GraficoRosca';
@@ -10,6 +10,19 @@ function ProcessosDashboard() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState('geral');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+    return () => window.removeEventListener('resize', checkScreen);
+  
+  }, []);
 
   useEffect(() => {
     carregarDados();
@@ -69,14 +82,14 @@ function ProcessosDashboard() {
 
   return (
     
-  <div style={{ padding: 16 }}>
+  <div style={{ padding: isMobile ? 8 : 16 }}>
     
     <Row gutter={[12, 12]} style={{ marginBottom: 20 }}>
       
       <Col xs={12} sm={12} md={6} lg={4}>
         
         <Card size="small">
-          <Statistic title="Total de processos" value={data?.totalProcessos || 0} prefix={<FolderOutlined />} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+          <Statistic title="Total de processos" value={data?.totalProcessos || 0} prefix={<FolderOutlined />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 18 : 20 } }} />
         </Card>
     
       </Col>
@@ -84,7 +97,7 @@ function ProcessosDashboard() {
       <Col xs={12} sm={12} md={6} lg={4}>
         
         <Card size="small">
-          <Statistic title="Processos ativos" value={data?.processosAtivos || 0} prefix={<CheckCircleOutlined />} styles={{ content: { color: '#52c41a', fontSize: 20 } }} />
+          <Statistic title="Processos ativos" value={data?.processosAtivos || 0} prefix={<CheckCircleOutlined />} styles={{ content: { color: '#52c41a', fontSize: isMobile ? 18 : 20 } }} />
         </Card>
     
       </Col>
@@ -92,7 +105,7 @@ function ProcessosDashboard() {
       <Col xs={12} sm={12} md={6} lg={4}>
         
         <Card size="small">
-          <Statistic title="Processos encerrados" value={data?.processosEncerrados || 0} prefix={<CloseCircleOutlined />} styles={{ content: { color: '#ff4d4f', fontSize: 20 } }} />
+          <Statistic title="Processos encerrados" value={data?.processosEncerrados || 0} prefix={<CloseCircleOutlined />} styles={{ content: { color: '#ff4d4f', fontSize: isMobile ? 18 : 20 } }} />
         </Card>
       
       </Col>
@@ -100,7 +113,7 @@ function ProcessosDashboard() {
       <Col xs={12} sm={12} md={6} lg={4}>
         
         <Card size="small">
-          <Statistic title="Duração média" value={data?.duracaoMediaDias || 0} suffix="dias" styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+          <Statistic title="Duração média" value={data?.duracaoMediaDias || 0} suffix="dias" styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 18 : 20 } }} />
         </Card>
       
       </Col>
@@ -108,7 +121,7 @@ function ProcessosDashboard() {
       <Col xs={12} sm={12} md={6} lg={4}>
         
         <Card size="small">
-          <Statistic title="Causas em aberto" value={formatCurrency(data?.valorCausasEmAberto)} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+          <Statistic title="Causas em aberto" value={formatCurrency(data?.valorCausasEmAberto)} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 18 : 20 } }} />
         </Card>
     
       </Col>
@@ -116,7 +129,7 @@ function ProcessosDashboard() {
       <Col xs={12} sm={12} md={6} lg={4}>
         
         <Card size="small">
-          <Statistic title="Total de honorários" value={formatCurrency(data?.totalHonorarios)} styles={{ content: { color: '#8b1a4a', fontSize: 20 } }} />
+          <Statistic title="Total de honorários" value={formatCurrency(data?.totalHonorarios)} styles={{ content: { color: '#8b1a4a', fontSize: isMobile ? 18 : 20 } }} />
         </Card>
     
       </Col>
@@ -128,7 +141,7 @@ function ProcessosDashboard() {
       <Col xs={12} sm={12} md={6} lg={6}>
           
         <Card size="small">
-          <Statistic title="Maior valor de causa" value={formatCurrency(data?.maiorValorCausa)} prefix={<TrophyOutlined />} styles={{ content: { color: '#faad14', fontSize: 20 } }} />
+          <Statistic title="Maior valor de causa" value={formatCurrency(data?.maiorValorCausa)} prefix={<TrophyOutlined />} styles={{ content: { color: '#faad14', fontSize: isMobile ? 18 : 20 } }} />
         </Card>
     
       </Col>
@@ -136,7 +149,7 @@ function ProcessosDashboard() {
       <Col xs={12} sm={12} md={6} lg={6}>
         
         <Card size="small">
-          <Statistic title="Maior honorário" value={formatCurrency(data?.maiorHonorario)} prefix={<WalletOutlined />} styles={{ content: { color: '#c42560', fontSize: 20 } }} />
+          <Statistic title="Maior honorário" value={formatCurrency(data?.maiorHonorario)} prefix={<WalletOutlined />} styles={{ content: { color: '#c42560', fontSize: isMobile ? 18 : 20 } }} />
         </Card>
     
       </Col>

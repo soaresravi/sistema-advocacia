@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Input, Button, Space, Modal, Form, Select, Tabs, notification, Row, Col, Card, DatePicker } from 'antd';
+import { Table, Input, Button, Space, Modal, Form, Select, Tabs, notification, Row, Col, Card, DatePicker, Typography } from 'antd';
 import { SearchOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, UserOutlined, ShopOutlined, EnvironmentOutlined, MoreOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { getClientesPF, getClientesPJ, createClientePF, updateClientePF, deleteClientePF, createClientePJ, updateClientePJ, deleteClientePJ, buscarCep, buscarCidades, buscarEstados } from '../../services/clienteService';
@@ -57,6 +57,7 @@ function ClientesLista() {
     const [activeTab, setActiveTab] = useState('pf');
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    const [isMobile, setIsMobile] = useState(false);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
     const [searchText, setSearchText] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
@@ -68,6 +69,13 @@ function ClientesLista() {
     const [cidades, setCidades] = useState([]);
     const [loadingCep, setLoadingCep] = useState(false);
     const [cepInput, setCepInput] = useState('');
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarEstados();
@@ -376,68 +384,210 @@ function ClientesLista() {
 
     return (
     
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
         
         <Card size="small">
             
             <Row gutter={[16, 16]} justify="space-between" align="middle">
                 
-                <Col>
+                <Col xs={24} md={12}>
                 
-                <Space>
-                    <Input placeholder="Buscar por nome ou CPF/CNPJ" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 250 }} prefix={<SearchOutlined />} />
-                    <Button type="primary" onClick={handleSearch} icon={<SearchOutlined />} style={{ background: '#4e0c1e' }}> Buscar </Button>
-                    <Button onClick={handleReset} icon={<ReloadOutlined />}> Limpar </Button>
+                <Space wrap orientation={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
+                    <Input placeholder="Buscar por nome ou CPF/CNPJ" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: isMobile ? '100%' : 250 }} prefix={<SearchOutlined />} />
+                    <Button type="primary" onClick={handleSearch} icon={<SearchOutlined />} style={{ background: '#4e0c1e', width: isMobile ? '100%' : 'auto' }}> Buscar </Button>
+                    <Button onClick={handleReset} icon={<ReloadOutlined />} style={{ width: isMobile ? '100%' : 'auto' }}> Limpar </Button>
                 </Space>
 
                 </Col>
-                <Col>
+                <Col xs={24} md={12} style={{ textAlign: isMobile ? 'center' : 'right', marginTop: isMobile ? 8 : 0 }}>
                 
-                <Space>
-                    <Button type="primary" onClick={handleAddPF} icon={<UserOutlined />} style={{ background: '#4e0c1e', color: '#fff' }}> Novo cliente PF </Button>
-                    <Button type="primary" onClick={handleAddPJ} icon={<ShopOutlined />} style={{ background: '#8b1a4a', color: '#fff' }}> Novo cliente PJ </Button>
+                <Space wrap orientation={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
+                    <Button type="primary" onClick={handleAddPF} icon={<UserOutlined />} style={{ background: '#4e0c1e', color: '#fff', width: isMobile ? '100%' : 'auto'}}> Novo cliente PF </Button>
+                    <Button type="primary" onClick={handleAddPJ} icon={<ShopOutlined />} style={{ background: '#8b1a4a', color: '#fff', width: isMobile ? '100%' : 'auto'}}> Novo cliente PJ </Button>
                 </Space>
 
                 </Col>
 
             </Row>
       
-            <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginTop: 16 }} className="custom-tabs"
-            
-            items={[
+            <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginTop: 16 }} className="custom-tabs" items={[
                 
-                { key: 'pf', label: <span><UserOutlined /> Pessoa Física</span>,
-                
-                children: (
+                { key: 'pf', label: <span><UserOutlined /> Pessoa física</span>, children: (
                 
                 <>
-                    <Table columns={pfColumns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => {setPagination({ ...pagination, current: pagination.current }); }} scroll={{ x: 800 }} size="small" />
+                    
+                    {!isMobile ? (
+                        
+                        <>
+                            <Table columns={pfColumns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => {setPagination({ ...pagination, current: pagination.current }); }} scroll={{ x: 800 }} size="small" />
+                        </>
+                            
+                    ) : (
+                        
+                        <div style={{ marginTop: 16 }}>
+                                
+                            {loading ? (
+                                <div style={{ textAlign: 'center', padding: 20 }}>Carregando...</div>
+                            ) : (
+                                    
+                                <>
+                                        
+                                    {data.map((record) => (
+                                            
+                                        <Card key={record.id} size="small" style={{ marginBottom: 8, borderRadius: 6 }} styles={{ body: { padding: '8px 10px' } }}>
+                                                
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                                <Typography.Text strong style={{ color: '#4e0c1e', fontSize: 13 }}>{record.nome}</Typography.Text>
+                                                <Button type="link" icon={<MoreOutlined />} onClick={() => handleViewDetails(record)} style={{ color: '#4e0c1e', padding: 0 }} size="small" />
+                                            </div>
+                        
+                                            <Row gutter={[6, 4]}>
+            
+                                                <Col span={12}>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10 }}>CPF</Typography.Text>
+                                                    <div style={{ fontSize: 11 }}>{record.cpf || '-'}</div>
+                                                </Col>
                 
+                                                <Col span={12}>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10 }}>Telefone</Typography.Text>
+                                                    <div style={{ fontSize: 11 }}>{record.telefone || '-'}</div>
+                                                </Col>
+                            
+                                            </Row>
+                
+                                            <Row gutter={[6, 4]}>
+    
+                                                <Col span={24}>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10 }}>Email</Typography.Text>
+                                                    <div style={{ fontSize: 11 }}>{record.email || '-'}</div>
+                                                </Col>
+                
+                                            </Row>
+                                            
+                                            <Row gutter={[6, 4]}>
+                                
+                                                <Col span={24}>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10 }}>Cidade</Typography.Text>
+                                                    <div style={{ fontSize: 11 }}>{record.cidade || '-'}</div>
+                                                </Col>
+                                    
+                                            </Row>
+                        
+                                        </Card>
+                                    
+                                    ))}
+                                    
+                                    {pagination.total > 0 && (
+                                        
+                                        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 12 }}>
+                                            <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current - 1 })} disabled={pagination.current === 1}> Anterior </Button>
+                                            <span style={{ fontSize: 12 }}>{pagination.current} / {Math.ceil(pagination.total / pagination.pageSize)}</span>
+                                            <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current + 1 })} disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}> Próxima </Button>
+                                        </div>
+
+                                    )}
+
+                                </>
+                            )}
+                        </div>
+                    )}
+                    
                     <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
                         Total: {totalClientes} cliente{totalClientes !== 1 ? 's' : ''}
                     </div>
-                
+                    
                 </> )},
 
-                { key: 'pj', label: <span><ShopOutlined /> Pessoa Jurídica</span>,
-                
-                children: (
+                { key: 'pj', label: <span><ShopOutlined /> Pessoa jurídica</span>, children: (
                 
                 <>
+                
+                    {!isMobile ? (
+                        
+                        <>
+                            <Table columns={pjColumns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => { setPagination({ ...pagination, current: pagination.current }); }} scroll={{ x: 800 }} size="small" />
+                        </>
+                        
+                    ) : (
                     
-                    <Table columns={pjColumns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => { setPagination({ ...pagination, current: pagination.current }); }} scroll={{ x: 800 }} size="small" />
+                        <div style={{ marginTop: 16 }}>
+                            
+                            {loading ? (
+                                <div style={{ textAlign: 'center', padding: 20 }}>Carregando...</div>
+                            ) : (
+                                
+                                <>
+                                    
+                                    {data.map((record) => (
+
+                                        <Card key={record.id} size="small" style={{ marginBottom: 8, borderRadius: 6 }} styles={{ body: { padding: '8px 10px' } }}>
+                                            
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                                <Typography.Text strong style={{ color: '#4e0c1e', fontSize: 13 }}>{record.nomeFantasia}</Typography.Text>
+                                                <Button type="link" icon={<MoreOutlined />} onClick={() => handleViewDetails(record)} style={{ color: '#4e0c1e', padding: 0 }} size="small" />
+                                            </div>
+                                            
+                                            <Row gutter={[6, 4]}>
+                                                
+                                                <Col span={12}>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10 }}>CNPJ</Typography.Text>
+                                                    <div style={{ fontSize: 11 }}>{record.cnpj || '-'}</div>
+                                                </Col>
+
+                                                <Col span={12}>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10 }}>Telefone</Typography.Text>
+                                                    <div style={{ fontSize: 11 }}>{record.telefone || '-'}</div>
+                                                </Col>
+                
+                                            </Row>
+                                            
+                                            <Row gutter={[6, 4]}>
+                                
+                                                <Col span={24}>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10 }}>Email</Typography.Text>
+                                                    <div style={{ fontSize: 11 }}>{record.email || '-'}</div>
+                                                </Col>
+                                    
+                                            </Row>
+                        
+                                            <Row gutter={[6, 4]}>
+            
+                                                <Col span={24}>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10 }}>Cidade</Typography.Text>
+                                                    <div style={{ fontSize: 11 }}>{record.cidade || '-'}</div>
+                                                </Col>
+                            
+                                            </Row>
+                
+                                        </Card>
+                                    ))}
+                                    
+                                    {pagination.total > 0 && (
+
+                                        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 12 }}>
+                                            <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current - 1 })} disabled={pagination.current === 1}> Anterior </Button>
+                                            <span style={{ fontSize: 12 }}>{pagination.current} / {Math.ceil(pagination.total / pagination.pageSize)}</span>
+                                            <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current + 1 })} disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}> Próxima </Button>
+                                        </div>
+                                    
+                                    )}
+
+                                </>
+                            )}
+                        </div>
+                    )}
                     
                     <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
                         Total: {totalClientes} cliente{totalClientes !== 1 ? 's' : ''}
                     </div>
 
-                </> )}
+                </> )},
               
             ]} />
 
         </Card>
 
-        <Modal title={!editingItem ? `Novo cliente ${activeTab === 'pf' ? 'pessoa física' : 'pessoa jurídica'}` : (isEditMode ? `Editar ${activeTab === 'pf' ? 'Pessoa Física' : 'Pessoa Jurídica'}` : 'Visualizar cliente')} open={modalVisible} onCancel={handleCancelModal}
+        <Modal title={!editingItem ? `Novo cliente ${activeTab === 'pf' ? 'pessoa física' : 'pessoa jurídica'}` : (isEditMode ? `Editar ${activeTab === 'pf' ? 'Pessoa Física' : 'Pessoa Jurídica'}` : 'Visualizar cliente')} open={modalVisible} onCancel={handleCancelModal} width={isMobile ? '90%' : 650}
         
         footer={!editingItem ? [
             
@@ -467,7 +617,7 @@ function ClientesLista() {
             <Button key="edit" type="primary" onClick={handleEnableEdit} style={{ background: '#4e0c1e' }}> <EditOutlined /> Editar Informações </Button>,
             <Button key="delete" danger onClick={() => {  Modal.confirm({ title: 'Excluir cliente', content: 'Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.', okText: 'Sim, excluir', cancelText: 'Não, cancelar', okButtonProps: { style: { background: '#4e0c1e' }, danger: true }, centered: true, onOk: handleDelete, });}}> <DeleteOutlined /> Excluir </Button>
         
-        ]} width={650} destroyOnHidden forceRender style={{ top: 50 }} mask={{ closable: false }}>
+        ]} destroyOnHidden forceRender style={{ top: 50 }} mask={{ closable: false }}>
             
             <Form form={form} layout="vertical" size="small" disabled={editingItem && !isEditMode}>
                 

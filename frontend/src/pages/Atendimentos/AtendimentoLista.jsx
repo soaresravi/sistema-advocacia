@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, Space, Modal, Form, Select, Row, Col, Card, DatePicker, notification, Tooltip, TimePicker } from 'antd';
+import { Table, Input, Drawer, Typography, Tag, Button, Space, Modal, Form, Select, Row, Col, Card, DatePicker, notification, Tooltip, TimePicker } from 'antd';
 import { SearchOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined, MoreOutlined, GoogleOutlined } from '@ant-design/icons';
 import { getAtendimentos, createAtendimento, updateAtendimento, deleteAtendimento, getGoogleStatus } from '../../services/atendimentoService';
 import { SIM_NAO_OPTIONS, COMO_CONHECEU_OPTIONS } from '../../constants/enums';
@@ -13,6 +13,8 @@ function AtendimentoLista() {
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
+  const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const [searchText, setSearchText] = useState('');
   const [filtroClienteNovo, setFiltroClienteNovo] = useState(null);
@@ -39,6 +41,13 @@ function AtendimentoLista() {
     });
 
   };
+
+  useEffect(() => {
+    const checkScreen = () => setIsMobile(window.innerWidth < 768);
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
 
   useEffect(() => {
     carregarDados();
@@ -271,50 +280,231 @@ function AtendimentoLista() {
 
   return (
   
-  <div style={{ padding: 16 }}>
+  <div style={{ padding: isMobile ? 8 : 16 }}>
     
     <Card size="small">
       
-      <Row gutter={[12, 12]} justify="space-between" align="middle">
+      {!isMobile && (
         
-        <Col xs={24} md={16}>
+        <Row gutter={[12, 12]} justify="space-between" align="middle">
+        
+          <Col xs={24} md={16}>
+                
+            <Space wrap>
+                  
+              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 200 }} prefix={<SearchOutlined />} />
+    
+              <Select placeholder="Cliente novo?" allowClear style={{ width: 120 }} value={filtroClienteNovo} onChange={setFiltroClienteNovo} options={SIM_NAO_OPTIONS} />
+              <Select placeholder="Fechou contrato?" allowClear style={{ width: 130 }} value={filtroFechouContrato} onChange={setFiltroFechouContrato} options={SIM_NAO_OPTIONS} />
           
-          <Space wrap>
-            
-            <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 200 }} prefix={<SearchOutlined />} />
-            <Select placeholder="Cliente novo?" allowClear style={{ width: 120 }} value={filtroClienteNovo} onChange={setFiltroClienteNovo} options={SIM_NAO_OPTIONS} />
-            <Select placeholder="Fechou contrato?" allowClear style={{ width: 130 }} value={filtroFechouContrato} onChange={setFiltroFechouContrato} options={SIM_NAO_OPTIONS} />
-            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" />
-            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" />
-            
-            <Button onClick={() => {
-              setSearchText('');
-              setFiltroClienteNovo(null);
-              setFiltroFechouContrato(null);
-              setFiltroDataInicio(null);
-              setFiltroDataFim(null);
-              setPagination({ ...pagination, current: 1 });
-            }} icon={<ReloadOutlined />}> Limpar </Button>
-
-          </Space>
-
-        </Col>
-        
-        <Col>
-          <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}> Novo atendimento </Button>
-        </Col>
+              <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" />
+              <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" />
+                  
+              <Button onClick={() => {
+                setSearchText('');
+                setFiltroClienteNovo(null);
+                setFiltroFechouContrato(null);
+                setFiltroDataInicio(null);
+                setFiltroDataFim(null);
+                setPagination({ ...pagination, current: 1 });
+              }} icon={<ReloadOutlined />}> Limpar </Button>
       
-      </Row>
-  
-      <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 900 }} size="small" style={{ marginTop: 16 }} />
+            </Space>
+      
+          </Col>
+              
+          <Col>
+            <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}> Novo atendimento </Button>
+          </Col>
+            
+        </Row>
+
+      )}
+
+      {isMobile && (
         
+        <>
+          
+          <div style={{ marginBottom: 16 }}>
+            
+            <Space orientation="vertical" style={{ width: '100%' }} size="small">
+              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+              <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
+              <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Novo atendimento </Button>
+            </Space>
+          
+          </div>
+
+          <Drawer title={<span style={{ color: '#4e0c1e' }}>Filtros</span>} placement="bottom" onClose={() => setFiltersDrawerOpen(false)} open={filtersDrawerOpen} size="auto">
+            
+            <Space orientation="vertical" style={{ width: '100%' }} size="middle">
+              
+              <Select placeholder="Cliente novo?" allowClear style={{ width: '100%' }} value={filtroClienteNovo} onChange={setFiltroClienteNovo} options={SIM_NAO_OPTIONS} />
+              <Select placeholder="Fechou contrato?" allowClear style={{ width: '100%' }} value={filtroFechouContrato} onChange={setFiltroFechouContrato} options={SIM_NAO_OPTIONS} />
+              
+              <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" style={{ width: '100%' }} />
+              <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" style={{ width: '100%' }} />
+              
+              <Button onClick={() => {
+                setFiltroClienteNovo(null);
+                setFiltroFechouContrato(null);
+                setFiltroDataInicio(null);
+                setFiltroDataFim(null);
+                setFiltersDrawerOpen(false);
+              }} style={{ width: '100%' }}> Limpar filtros </Button>
+              
+              <Button type="primary" onClick={() => setFiltersDrawerOpen(false)} style={{ background: '#4e0c1e', width: '100%' }}> Aplicar filtros </Button>
+            
+            </Space>
+          
+          </Drawer>
+        
+        </>
+      )}
+
+      {!isMobile && (
+        
+        <>
+          <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 900 }} size="small" style={{ marginTop: 16 }} />
+        </>
+      
+      )}
+
+      {isMobile && (
+        
+        <div style={{ marginTop: 16 }}>
+          
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: 20 }}>Carregando...</div>
+          ) : data.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>Nenhum atendimento encontrado</div>
+          ) : (
+            
+            <>
+          
+              {data.map((item) => {
+                
+                let clienteNovoLabel = '-';
+        
+                if (item.clienteNovo === 'Sim' || item.clienteNovo === 'SIM') clienteNovoLabel = 'Sim';
+                if (item.clienteNovo === 'Não' || item.clienteNovo === 'NAO') clienteNovoLabel = 'Não';
+                    
+                let fechouContratoLabel = '-';
+        
+                if (item.fechouContrato === 'Sim' || item.fechouContrato === 'SIM') fechouContratoLabel = 'Sim';
+                if (item.fechouContrato === 'Não' || item.fechouContrato === 'NAO') fechouContratoLabel = 'Não';
+
+                return (
+                  
+                  <Card key={item.id} size="small" style={{ marginBottom: 8, borderRadius: 6 }} styles={{ body: { padding: '8px 10px' } }}>
+          
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    
+                      <Typography.Text strong style={{ color: '#4e0c1e', fontSize: 13 }}>{item.nome || 'Sem nome'}</Typography.Text>
+                    
+                      <Tag color={item.googleEventId ? 'success' : 'default'} style={{ fontSize: 10, margin: 0, padding: '0px 6px', lineHeight: '18px' }}>
+                        {item.googleEventId ? <GoogleOutlined style={{ marginRight: 4 }} /> : null}
+                        {item.googleEventId ? 'Sinc.' : 'Não sinc.'}
+                      </Tag>
+                    
+                    </div>
+
+                    <Row gutter={[6, 4]}>
+          
+                      <Col span={12}>
+                        <Typography.Text type="secondary" style={{ fontSize: 10 }}>Data/Hora</Typography.Text>
+                        <div style={{ fontSize: 11 }}>{item.data ? dayjs(item.data).format('DD/MM/YYYY') : '-'} {item.hora || ''}</div>
+                      </Col>
+            
+                      <Col span={12}>
+                        <Typography.Text type="secondary" style={{ fontSize: 10 }}>Cliente novo?</Typography.Text>
+                        <div style={{ fontSize: 11 }}>{clienteNovoLabel}</div>
+                      </Col>
+                    
+                    </Row>
+
+                    <Row gutter={[6, 4]}>
+          
+                      <Col span={12}>
+                        <Typography.Text type="secondary" style={{ fontSize: 10 }}>Fechou contrato?</Typography.Text>
+                        <div style={{ fontSize: 11 }}>{fechouContratoLabel}</div>
+                      </Col>
+                      
+                      <Col span={12}>
+              
+                        <Typography.Text type="secondary" style={{ fontSize: 10 }}>Valor</Typography.Text>
+              
+                        <div style={{ fontSize: 11, fontWeight: 500, color: '#4e0c1e' }}>
+                          {item.valorConsulta ? `R$ ${item.valorConsulta.toLocaleString('pt-BR')}` : '-'}
+                        </div>
+    
+                      </Col>
+                    
+                    </Row>
+
+                    <Row gutter={[6, 4]}>
+                      
+                      <Col span={24}>
+                        <Typography.Text type="secondary" style={{ fontSize: 10 }}>Assunto</Typography.Text>
+                        <div style={{ fontSize: 11 }}>{item.assunto || '-'}</div>
+                      </Col>
+      
+                    </Row>
+
+                    <Row gutter={[6, 4]}>
+          
+                      <Col span={24}>
+                        <Typography.Text type="secondary" style={{ fontSize: 10 }}>Contato</Typography.Text>
+                        <div style={{ fontSize: 11 }}>{item.telefone || '-'} {item.email ? `| ${item.email}` : ''}</div>
+                      </Col>
+              
+                    </Row>
+
+                    {item.dataProximoContato && (
+
+                      <Row gutter={[6, 4]}>
+                        
+                        <Col span={24}>
+                          <Typography.Text type="secondary" style={{ fontSize: 10 }}>Próximo contato</Typography.Text>
+                          <div style={{ fontSize: 11 }}>{dayjs(item.dataProximoContato).format('DD/MM/YYYY')}</div>
+                        </Col>
+    
+                      </Row>
+                    
+                    )}
+
+                    <div style={{ marginTop: 8, textAlign: 'right' }}>
+                      <Button type="link" icon={<MoreOutlined />} onClick={() => handleViewDetails(item)} style={{ color: '#8b1a4a', padding: 0 }} size="small"> Ver detalhes </Button>
+                    </div>
+                  
+                  </Card>
+                
+                );
+
+              })}
+              
+              {pagination.total > 0 && (
+
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 12 }}>
+                  <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current - 1 })} disabled={pagination.current === 1}> Anterior </Button>
+                  <span style={{ fontSize: 12 }}>{pagination.current} / {Math.ceil(pagination.total / pagination.pageSize)}</span>
+                  <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current + 1 })} disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}> Próxima </Button>
+                </div>
+              
+              )}
+
+            </>
+          )}
+        </div>
+      )}
+
       <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
         Total: {pagination.total} atendimento{pagination.total !== 1 ? 's' : ''}
       </div>
       
     </Card>
   
-    <Modal title={!editingItem ? 'Novo atendimento' : (isEditMode ? 'Editar atendimento' : 'Visualizar atendimento')} open={modalVisible} onCancel={handleCancelModal} footer={
+    <Modal title={!editingItem ? 'Novo atendimento' : (isEditMode ? 'Editar atendimento' : 'Visualizar atendimento')} open={modalVisible} onCancel={handleCancelModal} width={isMobile ? '90%' : 600} footer={
     
     !editingItem ? [
       <Button key="cancel" onClick={handleCancelModal}>Cancelar</Button>,
@@ -352,7 +542,7 @@ function AtendimentoLista() {
         Modal.confirm({ title: 'Excluir atendimento', content: 'Tem certeza que deseja excluir este atendimento? Esta ação não pode ser desfeita.', okText: 'Sim, excluir', cancelText: 'Não, cancelar', okButtonProps: { style: { background: '#4e0c1e' }, danger: true }, centered: true, onOk: handleDelete, });
       }}> <DeleteOutlined /> Excluir </Button>,
     
-    ]} width={600} mask={{ closable: false }} style={{ top: 50 }}>
+    ]} mask={{ closable: false }} style={{ top: 50 }}>
       
       <Form form={form} layout="vertical" size="small" disabled={editingItem && !isEditMode}>
         

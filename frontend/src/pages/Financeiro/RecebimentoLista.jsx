@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Input, Button, Space, Modal, Form, Select, Row, Col, Card, DatePicker, notification } from 'antd';
+import { Table, Drawer, Typography, Tag, Input, Button, Space, Modal, Form, Select, Row, Col, Card, DatePicker, notification } from 'antd';
 import { SearchOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined, MoreOutlined } from '@ant-design/icons';
 import { getRecebimentos, createRecebimento, updateRecebimento, deleteRecebimento, getRecebimentosAtrasados } from '../../services/financeiroService';
 import { getClientesOptions } from '../../services/processoService';
@@ -14,13 +14,17 @@ function RecebimentoLista() {
 
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    const [isMobile, setIsMobile] = useState(false);
+    const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+
     const [searchText, setSearchText] = useState('');
     const [filtroTipo, setFiltroTipo] = useState(null);
     const [filtroTipoCliente, setFiltroTipoCliente] = useState(null);
     const [filtroRecebido, setFiltroRecebido] = useState(null);
     const [filtroDataInicio, setFiltroDataInicio] = useState(null);
     const [filtroDataFim, setFiltroDataFim] = useState(null);
+
     const [atrasados, setAtrasados] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalLoading, setModalLoading] = useState(false);
@@ -44,6 +48,13 @@ function RecebimentoLista() {
         });
 
     };
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarOpcoes();
@@ -264,7 +275,7 @@ function RecebimentoLista() {
 
     return (
     
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
         
         {atrasados.length > 0 && (
             
@@ -290,49 +301,159 @@ function RecebimentoLista() {
         )}
 
         <Card size="small">
-            
-            <Row gutter={[12, 12]} justify="space-between" align="middle">
-                
-                <Col xs={24} md={16}>
-                    
-                    <Space wrap>
-                        
-                        <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 200 }} prefix={<SearchOutlined />} />
-                        <Select placeholder="Tipo" allowClear style={{ width: 120 }} value={filtroTipo} onChange={setFiltroTipo} options={TIPO_RECEBIMENTO_OPTIONS} />
-                        <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={setFiltroTipoCliente} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
-                        <Select placeholder="Recebido?" allowClear style={{ width: 100 }} value={filtroRecebido} onChange={setFiltroRecebido} options={SIM_NAO_OPTIONS} />
-                        <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" />
-                        <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" />
-                        
-                        <Button onClick={() => {
-                            setSearchText('');
-                            setFiltroTipo(null);
-                            setFiltroTipoCliente(null);
-                            setFiltroRecebido(null);
-                            setFiltroDataInicio(null);
-                            setFiltroDataFim(null);
-                            setPagination({ ...pagination, current: 1 });
-                        }} icon={<ReloadOutlined />}>Limpar</Button>
-                    
-                    </Space>
-                
-                </Col>
-                
-                <Col>
-                    <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}>Novo recebimento</Button>
-                </Col>
-            
-            </Row>
 
-            <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 900 }} size="small" style={{ marginTop: 16 }} />
+            {!isMobile && (
                 
-                <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                    Total: {pagination.total} recebimento(s) | Valor total: R$ {totalRecebimentos.toLocaleString('pt-BR')}
+                <Row gutter={[12, 12]} justify="space-between" align="middle">
+                
+                    <Col xs={24} md={16}>
+                                
+                        <Space wrap>
+                                    
+                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 200 }} prefix={<SearchOutlined />} />
+                    
+                            <Select placeholder="Tipo" allowClear style={{ width: 120 }} value={filtroTipo} onChange={setFiltroTipo} options={TIPO_RECEBIMENTO_OPTIONS} />
+                            <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={setFiltroTipoCliente} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
+                            <Select placeholder="Recebido?" allowClear style={{ width: 100 }} value={filtroRecebido} onChange={setFiltroRecebido} options={SIM_NAO_OPTIONS} />
+                            
+                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" />
+                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" />
+                                    
+                            <Button onClick={() => {
+                                setSearchText('');
+                                setFiltroTipo(null);
+                                setFiltroTipoCliente(null);
+                                setFiltroRecebido(null);
+                                setFiltroDataInicio(null);
+                                setFiltroDataFim(null);
+                                setPagination({ ...pagination, current: 1 });
+                            }} icon={<ReloadOutlined />}>Limpar</Button>
+                                
+                        </Space>
+                            
+                    </Col>
+                            
+                    <Col>
+                        <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}>Novo recebimento</Button>
+                    </Col>
+                        
+                </Row>
+            )}
+
+            {isMobile && (
+                
+                <>
+                
+                    <div style={{ marginBottom: 16 }}>
+                        
+                        <Space orientation="vertical" style={{ width: '100%' }} size="small">
+                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e'}}> Filtros </Button>
+                            <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Novo recebimento </Button>
+                        </Space>
+                    
+                    </div>
+                    
+                    <Drawer title={<span style={{ color: '#4e0c1e' }}>Filtros</span>} placement="bottom" onClose={() => setFiltersDrawerOpen(false)} open={filtersDrawerOpen} size="auto">
+                        
+                        <Space orientation="vertical" style={{ width: '100%' }} size="middle">
+          
+                            <Select placeholder="Tipo" allowClear style={{ width: '100%' }} value={filtroTipo} onChange={setFiltroTipo} options={TIPO_RECEBIMENTO_OPTIONS} />
+                            <Select placeholder="Tipo de cliente" allowClear style={{ width: '100%' }} value={filtroTipoCliente} onChange={setFiltroTipoCliente} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
+                            <Select placeholder="Recebido?" allowClear style={{ width: '100%' }} value={filtroRecebido} onChange={setFiltroRecebido} options={SIM_NAO_OPTIONS} />
+                            
+                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" style={{ width: '100%' }} />
+                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" style={{ width: '100%' }} />
+                            
+                            <Button onClick={() => {
+                                setFiltroTipo(null);
+                                setFiltroTipoCliente(null);
+                                setFiltroRecebido(null);
+                                setFiltroDataInicio(null);
+                                setFiltroDataFim(null);
+                                setFiltersDrawerOpen(false);
+                            }} style={{ width: '100%' }}> Limpar filtros </Button>
+                            
+                            <Button type="primary" onClick={() => setFiltersDrawerOpen(false)} style={{ background: '#4e0c1e', width: '100%' }}> Aplicar filtros </Button>
+                        
+                        </Space>
+                    
+                    </Drawer>
+                </>
+            )}
+
+            {!isMobile && (
+            
+                <>
+                    <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 900 }} size="small" style={{ marginTop: 16 }} />
+                </>
+
+            )}
+
+            {isMobile && (
+                
+                <div style={{ marginTop: 16 }}>
+                    
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: 20 }}>Carregando...</div>
+                    ) : data.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>Nenhum recebimento encontrado</div>
+                    ) : (
+                    
+                        <>
+                        
+                            {data.map((item) => (
+                            
+                                <Card key={item.id} size="small" style={{ marginBottom: 8, borderRadius: 6 }} styles={{ body: { padding: '8px 10px' } }}>
+                            
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                        <Typography.Text strong style={{ color: '#4e0c1e', fontSize: 13 }}>R$ {item.valor?.toLocaleString('pt-BR')}</Typography.Text>
+                                        <Tag color={item.recebido ? 'green' : 'red'} style={{ fontSize: 10, margin: 0 }}> {item.recebido ? 'Recebido' : 'Pendente'} </Tag>
+                                    </div>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                        <Col span={12}><Typography.Text type="secondary" style={{ fontSize: 10 }}>Tipo</Typography.Text><div style={{ fontSize: 11 }}>{item.tipo?.descricao || item.tipo || '-'}</div></Col>
+                                        <Col span={12}><Typography.Text type="secondary" style={{ fontSize: 10 }}>Data prevista</Typography.Text><div style={{ fontSize: 11 }}>{item.dataPrevistaRecebimento ? dayjs(item.dataPrevistaRecebimento).format('DD/MM/YYYY') : '-'}</div></Col>
+                                    </Row>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                        <Col span={24}><Typography.Text type="secondary" style={{ fontSize: 10 }}>Cliente</Typography.Text><div style={{ fontSize: 11 }}>{item.clienteNome || '-'}</div></Col>
+                                    </Row>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                        <Col span={24}><Typography.Text type="secondary" style={{ fontSize: 10 }}>Processo</Typography.Text><div style={{ fontSize: 11 }}>{item.processoNumero || '-'}</div></Col>
+                                    </Row>
+                                    
+                                    <div style={{ marginTop: 8, textAlign: 'right' }}>
+                                        <Button type="link" icon={<MoreOutlined />} onClick={() => handleViewDetails(item)} style={{ color: '#8b1a4a', padding: 0 }} size="small">Ver detalhes</Button>
+                                    </div>
+                                
+                                </Card>
+                            
+                            ))}
+                            
+                            {pagination.total > 0 && (
+                            
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 12 }}>
+                                    <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current - 1 })} disabled={pagination.current === 1}> Anterior </Button>
+                                    <span style={{ fontSize: 12 }}>{pagination.current} / {Math.ceil(pagination.total / pagination.pageSize)}</span>
+                                    <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current + 1 })} disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}> Próxima </Button>
+                                </div>
+                                
+                            )}
+                            
+                        </>
+                    )}
                 </div>
+            )}
+            
+            <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
+                Total: {pagination.total} recebimento(s) | Valor total: R$ {totalRecebimentos.toLocaleString('pt-BR')}
+            </div>
 
         </Card>
 
-        <Modal title={!editingItem ? 'Novo recebimento' : (isEditMode ? 'Editar recebimento' : 'Visualizar recebimento')} open={modalVisible} onCancel={handleCancelModal} footer={
+        <Modal title={!editingItem ? 'Novo recebimento' : (isEditMode ? 'Editar recebimento' : 'Visualizar recebimento')} open={modalVisible} onCancel={handleCancelModal} width={isMobile ? '90%' : 600} footer={
                 
             !editingItem ? [
                 <Button key="cancel" onClick={handleCancelModal}>Cancelar</Button>,
@@ -366,7 +487,7 @@ function RecebimentoLista() {
                 }}><DeleteOutlined /> Excluir</Button>,
             ]
            
-        } width={600} mask={{ closable: false }} style={{ top: 50 }}>
+        } mask={{ closable: false }} style={{ top: 50 }}>
 
             <Form form={form} layout="vertical" size="small" disabled={editingItem && !isEditMode}>
                     

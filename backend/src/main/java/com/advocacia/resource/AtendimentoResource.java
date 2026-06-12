@@ -248,36 +248,38 @@ public class AtendimentoResource {
 
     public Response dashboard(@QueryParam("ano") Integer ano) {
 
+        int anoFiltro = ano != null ? ano : LocalDate.now().getYear();
+
         List<Atendimento> todos = Atendimento.list("userId", getUserId());
+        List<Atendimento> filtradas = todos.stream().filter(a -> a.data != null && a.data.getYear() == anoFiltro).collect(Collectors.toList());
         Map<String, Object> dashboard = new HashMap<>();
 
-        dashboard.put("total", todos.size());
+        dashboard.put("total", filtradas.size());
 
-        BigDecimal totalConsultas = todos.stream().filter(a -> a.valorConsulta != null).map(a -> a.valorConsulta).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalConsultas = filtradas.stream().filter(a -> a.valorConsulta != null).map(a -> a.valorConsulta).reduce(BigDecimal.ZERO, BigDecimal::add);
         dashboard.put("totalConsultas", totalConsultas);
         
-        long novos = todos.stream().filter(a -> a.clienteNovo == SimNao.SIM).count();
-        long antigos = todos.stream().filter(a -> a.clienteNovo == SimNao.NAO).count();
+        long novos = filtradas.stream().filter(a -> a.clienteNovo == SimNao.SIM).count();
+        long antigos = filtradas.stream().filter(a -> a.clienteNovo == SimNao.NAO).count();
 
         Map<String, Object> novosAntigos = new LinkedHashMap<>();
 
-        novosAntigos.put("Novos", Map.of("quantidade", novos, "percentual", todos.size() > 0 ? (novos * 100 / todos.size()) : 0));
-        novosAntigos.put("Antigos", Map.of("quantidade", antigos, "percentual", todos.size() > 0 ? (antigos * 100 / todos.size()) : 0));
+        novosAntigos.put("Novos", Map.of("quantidade", novos, "percentual", filtradas.size() > 0 ? (novos * 100 / filtradas.size()) : 0));
+        novosAntigos.put("Antigos", Map.of("quantidade", antigos, "percentual", filtradas.size() > 0 ? (antigos * 100 / filtradas.size()) : 0));
 
         dashboard.put("novosAntigos", novosAntigos);
 
-        long fechou = todos.stream().filter(a -> a.fechouContrato == SimNao.SIM).count();
-        long naoFechou = todos.stream().filter(a -> a.fechouContrato == SimNao.NAO).count();
+        long fechou = filtradas.stream().filter(a -> a.fechouContrato == SimNao.SIM).count();
+        long naoFechou = filtradas.stream().filter(a -> a.fechouContrato == SimNao.NAO).count();
 
         Map<String, Object> fechouContrato = new LinkedHashMap<>();
 
-        fechouContrato.put("Fechou", Map.of("quantidade", fechou, "percentual", todos.size() > 0 ? (fechou * 100 / todos.size()) : 0));
-        fechouContrato.put("Não fechou", Map.of("quantidade", naoFechou, "percentual", todos.size() > 0 ? (naoFechou * 100 / todos.size()) : 0));
+        fechouContrato.put("Fechou", Map.of("quantidade", fechou, "percentual", filtradas.size() > 0 ? (fechou * 100 / filtradas.size()) : 0));
+        fechouContrato.put("Não fechou", Map.of("quantidade", naoFechou, "percentual", filtradas.size() > 0 ? (naoFechou * 100 / filtradas.size()) : 0));
 
         dashboard.put("fechouContrato", fechouContrato);
 
-        int anoFiltro = ano != null ? ano : LocalDate.now().getYear();
-        Map<Integer, Long> porMes = todos.stream().filter(a -> a.data != null && a.data.getYear() == anoFiltro).collect(Collectors.groupingBy(a -> a.data.getMonthValue(), Collectors.counting()));
+        Map<Integer, Long> porMes = filtradas.stream().filter(a -> a.data != null && a.data.getYear() == anoFiltro).collect(Collectors.groupingBy(a -> a.data.getMonthValue(), Collectors.counting()));
         
         dashboard.put("porMes", porMes);
         dashboard.put("ano", anoFiltro);

@@ -10,7 +10,9 @@ const { Text } = Typography;
 function Header() {
  
   const navigate = useNavigate();
+
   const [user, setUser] = useState({ nome: '', email: '' });
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     
@@ -21,9 +23,17 @@ function Header() {
     };
     
     window.addEventListener('user-updated', handleUserUpdate);
+
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
     
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+
     return () => {
       window.removeEventListener('user-updated', handleUserUpdate);
+      window.removeEventListener('resize', checkScreen);
     };
 
   }, []);
@@ -54,17 +64,17 @@ function Header() {
 
   return (
   
-  <AntHeader style={{ background: '#fff', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <AntHeader style={{ background: '#fff', padding: isMobile ? '0 12px' : '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
     
     <div>
-      <Text strong style={{color: '#4e0c1e'}}>Bem-vindo, {user.nome || 'Usuário'}!</Text>
+      <Text strong style={{ color: '#4e0c1e', fontSize: isMobile ? 12 : 14, marginLeft: isMobile ? 50 : 0 }}> Bem-vindo, {user?.nome || 'Usuário'}! </Text>
     </div>
   
     <Dropdown menu={{ items: menuItems }} placement="bottomRight">
       
       <Space style={{ cursor: 'pointer' }}>
-        <Avatar icon={<UserOutlined />} />
-        <Text>{user.email}</Text>
+        <Avatar icon={<UserOutlined />} size={isMobile ? 'small' : 'default'} />
+        {!isMobile && <Text> {user.email} </Text>}
       </Space>
       
     </Dropdown>

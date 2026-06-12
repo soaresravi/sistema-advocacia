@@ -13,17 +13,17 @@ const renderActiveShape = (props) => {
 
 };
 
-function GraficoRosca({ data, title }) {
+function GraficoRosca({ data, title, isMobile }) {
 
   const [key, setKey] = useState(0);
 
   useEffect(() => {
 
-      const timeout = setTimeout(() => {
-        setKey(prev => prev + 1);
-      }, 200);
+    const timeout = setTimeout(() => {
+      setKey(prev => prev + 1);
+    }, 200);
 
-      return () => clearTimeout(timeout);
+    return () => clearTimeout(timeout);
 
   }, []);
  
@@ -45,16 +45,16 @@ function GraficoRosca({ data, title }) {
 
   return (
   
-  <div style={{ width: '100%', height: 270 }}>
+  <div style={{ width: isMobile ? 319 : '100%', height: isMobile ? 200 : 270 }}>
     
-    <h4 style={{ textAlign: 'center', marginBottom: 8, fontSize: 14 }}>{title}</h4>
+    <h4 style={{ textAlign: 'center', marginBottom: 8, fontSize: isMobile ? 12 : 14 }}>{title}</h4>
       
-    <div style={{ height: 220 }}>
+    <div style={{ height: isMobile ? 150 : 220 }}>
       
       <ResponsiveContainer key={key}>
         
         <PieChart>
-          <Pie data={chartData} cx="50%" cy="50%" innerRadius={40} outerRadius={80} paddingAngle={3} dataKey="value" nameKey="label" label={({ label, percent }) => `${label}: ${(percent * 100).toFixed(0)}%`} labelLine={false} shape={renderActiveShape} />
+          <Pie data={chartData} cx="50%" cy="50%" innerRadius={isMobile ? 15 : 40} outerRadius={isMobile ? 45 : 80} paddingAngle={3} dataKey="value" nameKey="label" label={({ label, percent }) => `${label}: ${(percent * 100).toFixed(0)}%`} labelLine={false} shape={renderActiveShape} />
           <Tooltip formatter={(value, name, props) => [`${value} (${props.payload.percentual}%)`, name]} />
         </PieChart>
 
@@ -62,13 +62,13 @@ function GraficoRosca({ data, title }) {
 
     </div>
 
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? 8 : 16, flexWrap: 'wrap', marginTop: isMobile ? 8 : 0 }}>
       
       {legendItems.map((item) => (
         
-        <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 12, height: 12, backgroundColor: item.color, borderRadius: 2 }} />
-          <span style={{ fontSize: 11 }}>{item.label}</span>
+        <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 10, height: 10, backgroundColor: item.color, borderRadius: 2 }} />
+          <span style={{ fontSize: isMobile ? 9 : 11 }}>{item.label}</span>
         </div>
 
       ))}

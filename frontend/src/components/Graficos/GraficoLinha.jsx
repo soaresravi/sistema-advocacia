@@ -4,7 +4,7 @@ const meses = [
     'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
 ];
 
-function GraficoLinha({ data, title, ano }) {
+function GraficoLinha({ data, title, ano, isMobile }) {
 
     if (!data || Object.keys(data).length === 0) {
         return <div style={{ textAlign: 'center', padding: 40, fontSize: 12 }}>Sem dados para exibir</div>;
@@ -17,10 +17,10 @@ function GraficoLinha({ data, title, ano }) {
 
     return (
     
-    <div style={{ width: '100%', height: 350 }}>
+    <div style={{ width: '100%', height: isMobile ? 250 : 350 }}>
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h4 style={{ margin: 0, fontSize: 14 }}>{title}</h4>
+            <h4 style={{ margin: 0, fontSize: isMobile ? 13 : 14 }}>{title}</h4>
             <span style={{ fontSize: 12, color: '#888' }}>Ano: {ano}</span>
         </div>
         

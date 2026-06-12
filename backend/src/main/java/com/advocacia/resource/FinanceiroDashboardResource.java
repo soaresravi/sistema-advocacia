@@ -114,7 +114,7 @@ public class FinanceiroDashboardResource {
        
         BigDecimal totalAReceberHoje = todosRecebimentos.stream().filter(r -> r.dataPrevistaRecebimento != null && r.dataPrevistaRecebimento.equals(hoje)).filter(r -> !Boolean.TRUE.equals(r.recebido)).map(r -> r.valor != null ? r.valor : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalAPagarHoje = todasDespesas.stream().filter(d -> d.dataPrevistaPagamento != null && d.dataPrevistaPagamento.equals(hoje)).filter(d -> !Boolean.TRUE.equals(d.pago)).map(d -> d.valor != null ? d.valor : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalRecebimentosAtraso = todosRecebimentos.stream().filter(r -> r.dataPrevistaRecebimento != null && r.dataPrevistaRecebimento.isBefore(hoje)).filter(r -> !Boolean.TRUE.equals(r.recebido)).map(r -> r.valor != null ? r.valor : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalRecebimentosAtraso = todosRecebimentos.stream().filter(r -> r.dataPrevistaRecebimento != null && r.dataPrevistaRecebimento.isBefore(hoje) && r.dataPrevistaRecebimento.getYear() == anoFiltro).filter(r -> !Boolean.TRUE.equals(r.recebido)).map(r -> r.valor != null ? r.valor : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalDespesasAtraso = todasDespesas.stream().filter(d -> d.dataPrevistaPagamento != null && d.dataPrevistaPagamento.isBefore(hoje)).filter(d -> !Boolean.TRUE.equals(d.pago)).map(d -> d.valor != null ? d.valor : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);  
         
         dashboard.put("totalAReceberHoje", totalAReceberHoje);

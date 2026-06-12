@@ -248,28 +248,31 @@ public class AudienciaResource {
     @GET
     @Path("/dashboard")
 
-    public Response dashboard() {
+    public Response dashboard(@QueryParam("ano") Integer ano) {
+
+        int anoFiltro = ano != null ? ano : LocalDate.now().getYear();
 
         List<Audiencia> todas = Audiencia.list("userId", getUserId());
+        List<Audiencia> filtradas = todas.stream().filter(a -> a.data != null && a.data.getYear() == anoFiltro).collect(Collectors.toList());
         Map<String, Object> dashboard = new HashMap<>();
 
-        dashboard.put("total", todas.size());
-        dashboard.put("agendadas", todas.stream().filter(a -> a.status == StatusEvento.AGENDADO).count());
-        dashboard.put("concluidas", todas.stream().filter(a -> a.status == StatusEvento.CONCLUIDO).count());
-        dashboard.put("canceladas", todas.stream().filter(a -> a.status == StatusEvento.CANCELADO).count());
+        dashboard.put("total", filtradas.size());
+        dashboard.put("agendadas", filtradas.stream().filter(a -> a.status == StatusEvento.AGENDADO).count());
+        dashboard.put("concluidas", filtradas.stream().filter(a -> a.status == StatusEvento.CONCLUIDO).count());
+        dashboard.put("canceladas", filtradas.stream().filter(a -> a.status == StatusEvento.CANCELADO).count());
 
         Map<String, Long> horarios = new LinkedHashMap<>();
 
-        horarios.put("07h-09h", todas.stream().filter(a -> a.hora != null && a.hora.compareTo("07:00") >= 0 && a.hora.compareTo("09:00") < 0).count());
-        horarios.put("09h-11h", todas.stream().filter(a -> a.hora != null && a.hora.compareTo("09:00") >= 0 && a.hora.compareTo("11:00") < 0).count());
-        horarios.put("11h-13h", todas.stream().filter(a -> a.hora != null && a.hora.compareTo("11:00") >= 0 && a.hora.compareTo("13:00") < 0).count());
-        horarios.put("13h-15h", todas.stream().filter(a -> a.hora != null && a.hora.compareTo("13:00") >= 0 && a.hora.compareTo("15:00") < 0).count());
-        horarios.put("15h-17h", todas.stream().filter(a -> a.hora != null && a.hora.compareTo("15:00") >= 0 && a.hora.compareTo("17:00") < 0).count());
-        horarios.put("17h+", todas.stream().filter(a -> a.hora != null && a.hora.compareTo("17:00") >= 0).count());
+        horarios.put("07h-09h", filtradas.stream().filter(a -> a.hora != null && a.hora.compareTo("07:00") >= 0 && a.hora.compareTo("09:00") < 0).count());
+        horarios.put("09h-11h", filtradas.stream().filter(a -> a.hora != null && a.hora.compareTo("09:00") >= 0 && a.hora.compareTo("11:00") < 0).count());
+        horarios.put("11h-13h", filtradas.stream().filter(a -> a.hora != null && a.hora.compareTo("11:00") >= 0 && a.hora.compareTo("13:00") < 0).count());
+        horarios.put("13h-15h", filtradas.stream().filter(a -> a.hora != null && a.hora.compareTo("13:00") >= 0 && a.hora.compareTo("15:00") < 0).count());
+        horarios.put("15h-17h", filtradas.stream().filter(a -> a.hora != null && a.hora.compareTo("15:00") >= 0 && a.hora.compareTo("17:00") < 0).count());
+        horarios.put("17h+", filtradas.stream().filter(a -> a.hora != null && a.hora.compareTo("17:00") >= 0).count());
 
         dashboard.put("horarios", horarios);
 
-        Map<Integer, Long> porMes = todas.stream().filter(a -> a.data != null).collect(Collectors.groupingBy(a -> a.data.getMonthValue(), Collectors.counting()));
+        Map<Integer, Long> porMes = filtradas.stream().filter(a -> a.data != null).collect(Collectors.groupingBy(a -> a.data.getMonthValue(), Collectors.counting()));
         dashboard.put("porMes", porMes);
 
         return Response.ok(dashboard).build();

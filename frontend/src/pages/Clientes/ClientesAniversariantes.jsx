@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card, Select, Table, Spin, Row, Col, Statistic, message, Tag } from 'antd';
+import { Card, Select, Table, Row, Col, Statistic, message, Tag, Typography } from 'antd';
 import { GiftOutlined, UserOutlined, CalendarOutlined } from '@ant-design/icons';
 import { getAniversariantes, getAniversariantesHoje } from '../../services/clienteService';
 
 function ClientesAniversariantes() {
 
     const [loading, setLoading] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [data, setData] = useState([]);
     const [aniversariantesHoje, setAniversariantesHoje] = useState([]);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
@@ -24,6 +25,13 @@ function ClientesAniversariantes() {
         { value: 11, label: 'Novembro' },
         { value: 12, label: 'Dezembro' },
     ];
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarAniversariantes();
@@ -67,7 +75,7 @@ function ClientesAniversariantes() {
 
     return (
     
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
 
         <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
             
@@ -75,7 +83,7 @@ function ClientesAniversariantes() {
                 
                 <Card size="small">
                     
-                    <Statistic title="Aniversariantes de hoje" value={aniversariantesHoje.length} prefix={<GiftOutlined style={{ color: '#e05580' }} />} styles={{ content: { color: '#4e0c1e', fontSize: 24 } }} />
+                    <Statistic title="Aniversariantes de hoje" value={aniversariantesHoje.length} prefix={<GiftOutlined style={{ color: '#e05580' }} />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 20 : 24 } }} />
                     
                     {aniversariantesHoje.length > 0 && (
                     
@@ -107,7 +115,7 @@ function ClientesAniversariantes() {
             <Col xs={24} sm={12} md={8}>
                 
                 <Card size="small">
-                    <Statistic title="Aniversariantes do mês" value={data.length} prefix={<CalendarOutlined style={{ color: '#8b1a4a' }} />} styles={{ content: { color: '#4e0c1e', fontSize: 24 } }} />
+                    <Statistic title="Aniversariantes do mês" value={data.length} prefix={<CalendarOutlined style={{ color: '#8b1a4a' }} />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 20 : 24 } }} />
                 </Card>
 
             </Col>
@@ -115,7 +123,7 @@ function ClientesAniversariantes() {
             <Col xs={24} sm={12} md={8}>
                 
                 <Card size="small">
-                    <Statistic title="Total de clientes" value={[...data, ...aniversariantesHoje].length} prefix={<UserOutlined style={{ color: '#c42560' }} />} styles={{ content: { color: '#4e0c1e', fontSize: 24 } }} />
+                    <Statistic title="Total de clientes" value={[...data, ...aniversariantesHoje].length} prefix={<UserOutlined style={{ color: '#c42560' }} />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 20 : 24 } }} />
                 </Card>
 
             </Col>
@@ -124,19 +132,82 @@ function ClientesAniversariantes() {
 
         <Card size="small">
             
-            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center'}}>
                 
-                <div>
+                <div style={{ width: isMobile ? '100%' : 'auto' }}>
                     <span style={{ marginRight: 8, fontWeight: 500 }}>Selecione o mês:</span>
-                    <Select value={selectedMonth} onChange={setSelectedMonth} style={{ width: 150 }} size="small" options={meses} />
+                    <Select value={selectedMonth} onChange={setSelectedMonth} style={{ width: isMobile ? '100%' : 150 }} size="small" options={meses} />
                 </div>
                 
                 {selectedMonth === new Date().getMonth() + 1 && ( <Tag color="#4e0c1e" style={{ borderRadius: 16 }}> Mês atual </Tag> )}
 
             </div>
+
+            {!isMobile && (
+                <Table columns={columns} dataSource={data} rowKey="id" loading={loading} size="small" pagination={{ pageSize: 10, showTotal: (total) => `Total de ${total} aniversariantes` }} />
+            )}
             
-            <Table columns={columns} dataSource={data} rowKey="id" loading={loading} size="small" pagination={{ pageSize: 10, showTotal: (total) => `Total de ${total} aniversariantes` }} />
-        
+            {isMobile && (
+            
+                <div>
+                    
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: 20 }}>Carregando...</div>
+                    ) : data.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>
+                            Nenhum aniversariante neste mês
+                        </div>
+                    ) : (
+                    
+                        <>
+                        
+                            {data.map((item) => (
+                            
+                                <Card key={item.id} size="small" style={{ marginBottom: 8, borderRadius: 6 }} styles={{ body: { padding: '8px 10px' } }}>
+                                    
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                        <Typography.Text strong style={{ color: '#4e0c1e', fontSize: 13 }}> {item.nome} </Typography.Text>
+                                        <Typography.Text style={{ fontSize: 11, color: '#666' }}> {item.idade} anos </Typography.Text>
+                                    </div>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                        
+                                        <Col span={12}>
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>Data Nasc.</Typography.Text>
+                                            <div style={{ fontSize: 11 }}>{item.dataNascimento ? new Date(item.dataNascimento).toLocaleDateString('pt-BR') : '-'}</div>
+                                        </Col>
+                                        
+                                        <Col span={12}>
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>ID</Typography.Text>
+                                            <div style={{ fontSize: 11 }}>{item.id}</div>
+                                        </Col>
+                                    
+                                    </Row>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                    
+                                        <Col span={24}>
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>Telefone</Typography.Text>
+                                            <div style={{ fontSize: 11 }}>{item.telefone || '-'}</div>
+                                        </Col>
+                                    
+                                    </Row>
+                                    
+                                    <Row gutter={[6, 4]}>
+                                        
+                                        <Col span={24}>
+                                            <Typography.Text type="secondary" style={{ fontSize: 10 }}>Email</Typography.Text>
+                                            <div style={{ fontSize: 11, wordBreak: 'break-all' }}>{item.email || '-'}</div>
+                                        </Col>
+                                    
+                                    </Row>
+                                
+                                </Card>
+                            ))}
+                        </>
+                    )}
+                </div>
+            )}
         </Card>
 
     </div>

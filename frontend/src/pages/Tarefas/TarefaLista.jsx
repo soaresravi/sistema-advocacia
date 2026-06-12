@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, Space, Modal, Form, Select, Row, Col, Card, DatePicker, notification, Tooltip, Tag  } from 'antd';
+import { Table, Drawer, Typography, Input, Button, Space, Modal, Form, Select, Row, Col, Card, DatePicker, notification, Tooltip, Tag  } from 'antd';
 import { SearchOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined, MoreOutlined, GoogleOutlined } from '@ant-design/icons';
 import { getTarefas, createTarefa, updateTarefa, deleteTarefa, getGoogleStatus } from '../../services/tarefaService';
 import { getClientesOptions } from '../../services/processoService';
@@ -16,9 +16,13 @@ function TarefaLista() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+    const [isMobile, setIsMobile] = useState(false);
+    const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false);
+
     const [searchText, setSearchText] = useState('');
     const [filtroStatus, setFiltroStatus] = useState(null);
     const [filtroUrgencia, setFiltroUrgencia] = useState(null);
+    
     const [modalVisible, setModalVisible] = useState(false);
     const [modalLoading, setModalLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -41,6 +45,13 @@ function TarefaLista() {
         });
 
     };
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarOpcoes();
@@ -389,38 +400,158 @@ function TarefaLista() {
 
     return (
 
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
         
         <Card size="small">
+
+            {!isMobile && (
+                
+                <Row gutter={[12, 12]} justify="space-between" align="middle">
             
-            <Row gutter={[12, 12]} justify="space-between" align="middle">
-            
-                <Col xs={24} md={16}>
-            
-                    <Space wrap>
+                    <Col xs={24} md={16}>
                         
-                        <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 220 }} prefix={<SearchOutlined />} />
-                        <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_TAREFA_OPTIONS} />
-                        <Select placeholder="Urgência" allowClear style={{ width: 140 }} value={filtroUrgencia} onChange={setFiltroUrgencia} options={URGENCIA_TAREFA_OPTIONS} />
+                        <Space wrap>
+                                    
+                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 220 }} prefix={<SearchOutlined />} />
+                            
+                            <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_TAREFA_OPTIONS} />
+                            <Select placeholder="Urgência" allowClear style={{ width: 140 }} value={filtroUrgencia} onChange={setFiltroUrgencia} options={URGENCIA_TAREFA_OPTIONS} />
+                                    
+                            <Button onClick={() => {
+                                setSearchText('');
+                                setFiltroStatus(null);
+                                setFiltroUrgencia(null);
+                                setPagination({ ...pagination, current: 1 });
+                            }} icon={<ReloadOutlined />}>Limpar</Button>
+            
+                        </Space>
+            
+                    </Col>
+            
+                    <Col>
+                        <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}> Nova tarefa </Button>
+                    </Col>
+            
+                </Row>
+            )}
+
+            {isMobile && (
+                
+                <>
+                    
+                    <div style={{ marginBottom: 16 }}>
+                    
+                        <Space orientation="vertical" style={{ width: '100%' }} size="small">
+                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
+                            <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Nova tarefa </Button>
+                        </Space>
+                    
+                    </div>
+                    
+                    <Drawer title={<span style={{ color: '#4e0c1e' }}>Filtros</span>} placement="bottom" onClose={() => setFiltersDrawerOpen(false)} open={filtersDrawerOpen} size="auto">
                         
-                        <Button onClick={() => {
-                            setSearchText('');
-                            setFiltroStatus(null);
-                            setFiltroUrgencia(null);
-                            setPagination({ ...pagination, current: 1 });
-                        }} icon={<ReloadOutlined />}>Limpar</Button>
+                        <Space orientation="vertical" style={{ width: '100%' }} size="middle">
+                            
+                            <Select placeholder="Status" allowClear style={{ width: '100%' }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_TAREFA_OPTIONS} />
+                            <Select placeholder="Urgência" allowClear style={{ width: '100%' }} value={filtroUrgencia} onChange={setFiltroUrgencia} options={URGENCIA_TAREFA_OPTIONS} />
+                            
+                            <Button onClick={() => {
+                                setFiltroStatus(null);
+                                setFiltroUrgencia(null);
+                                setFiltersDrawerOpen(false);
+                            }} style={{ width: '100%' }}> Limpar filtros </Button>
+                            
+                            <Button type="primary" onClick={() => setFiltersDrawerOpen(false)} style={{ background: '#4e0c1e', width: '100%' }}> Aplicar filtros </Button>
+                        
+                        </Space>
+                    
+                    </Drawer>
 
-                    </Space>
+                </>
+            )}
 
-                </Col>
+            {!isMobile && (
+            
+                <>
+                    <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 900 }} size="small" style={{ marginTop: 16 }} />
+                </>
 
-                <Col>
-                    <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e' }}> Nova tarefa </Button>
-                </Col>
+            )}
 
-            </Row>
-
-            <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={pagination} onChange={(pagination) => setPagination({ ...pagination, current: pagination.current })} scroll={{ x: 900 }} size="small" style={{ marginTop: 16 }} />
+            {isMobile && (
+            
+                <div style={{ marginTop: 16 }}>
+                    
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: 20 }}>Carregando...</div>
+                    ) : data.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>Nenhuma tarefa encontrada</div>
+                    ) : (
+                    
+                        <>
+                        
+                            {data.map((item) => {
+                                
+                                let statusColor = 'default';
+                                
+                                if (item.status === 'CONCLUIDA') statusColor = 'success';
+                                if (item.status === 'EM_ANDAMENTO') statusColor = 'processing';
+                                
+                                let urgenciaColor = '#d9d9d9';
+                                
+                                if (item.urgencia === 'EXIGE_ATENCAO_IMEDIATA') urgenciaColor = '#ff4d4f';
+                                else if (item.urgencia === 'MUITO_URGENTE') urgenciaColor = '#ff7a45';
+                                else if (item.urgencia === 'REQUER_ATENCAO') urgenciaColor = '#faad14';
+                                else if (item.urgencia === 'POUCO_URGENTE') urgenciaColor = '#52c41a';
+                                else if (item.urgencia === 'PODE_ESPERAR') urgenciaColor = '#1890ff';
+                                
+                                return (
+                                
+                                    <Card key={item.id} size="small" style={{ marginBottom: 8, borderRadius: 6, borderLeft: `4px solid ${urgenciaColor}` }} styles={{ body: { padding: '8px 10px' } }}>
+                                        
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                            <Typography.Text strong style={{ color: '#4e0c1e', fontSize: 13 }}>{item.tarefa}</Typography.Text>
+                                            <Tag color={statusColor} style={{ fontSize: 10, margin: 0 }}>{STATUS_TAREFA_OPTIONS.find(o => o.value === item.status)?.label || '-'}</Tag>
+                                        </div>
+                                        
+                                        <Row gutter={[6, 4]}>
+                                            <Col span={12}><Typography.Text type="secondary" style={{ fontSize: 10 }}>Prazo</Typography.Text><div style={{ fontSize: 11 }}>{item.prazoTarefa ? dayjs(item.prazoTarefa).format('DD/MM/YYYY') : '-'}</div></Col>
+                                            <Col span={12}><Typography.Text type="secondary" style={{ fontSize: 10 }}>Responsável</Typography.Text><div style={{ fontSize: 11 }}>{item.responsavel || '-'}</div></Col>
+                                        </Row>
+                                        
+                                        <Row gutter={[6, 4]}>
+                                            <Col span={24}><Typography.Text type="secondary" style={{ fontSize: 10 }}>Cliente</Typography.Text><div style={{ fontSize: 11 }}>{item.clienteNome || '-'}</div></Col>
+                                        </Row>
+                                        
+                                        <Row gutter={[6, 4]}>
+                                            <Col span={24}><Typography.Text type="secondary" style={{ fontSize: 10 }}>Processo</Typography.Text><div style={{ fontSize: 11 }}>{item.processoNumero || '-'}</div></Col>
+                                        </Row>
+                                        
+                                        <div style={{ marginTop: 8, textAlign: 'right' }}>
+                                            <Button type="link" icon={<MoreOutlined />} onClick={() => handleViewDetails(item)} style={{ color: '#8b1a4a', padding: 0 }} size="small">Ver detalhes</Button>
+                                        </div>
+                                        
+                                    </Card>
+                                
+                                );
+                                
+                            })}
+                            
+                            {pagination.total > 0 && (
+                            
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 12 }}>
+                                    <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current - 1 })} disabled={pagination.current === 1}> Anterior </Button>
+                                    <span style={{ fontSize: 12 }}>{pagination.current} / {Math.ceil(pagination.total / pagination.pageSize)}</span>
+                                    <Button size="small" onClick={() => setPagination({ ...pagination, current: pagination.current + 1 })} disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}> Próxima </Button>
+                                </div>
+                            
+                            )}
+                        
+                        </>
+                    )}
+                </div>
+            )}
 
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
                 Total: {pagination.total} tarefa{pagination.total !== 1 ? 's' : ''}
@@ -428,7 +559,7 @@ function TarefaLista() {
 
         </Card>
 
-        <Modal title={!editingItem ? 'Nova tarefa' : (isEditMode ? 'Editar tarefa' : 'Visualizar tarefa')} open={modalVisible} onCancel={handleCancelModal} footer={
+        <Modal title={!editingItem ? 'Nova tarefa' : (isEditMode ? 'Editar tarefa' : 'Visualizar tarefa')} open={modalVisible} onCancel={handleCancelModal} width={isMobile ? '90%' : 700} footer={
             
         !editingItem ? [
             <Button key="cancel" onClick={handleCancelModal}>Cancelar</Button>,
@@ -455,7 +586,7 @@ function TarefaLista() {
         ] : [
             <Button key="edit" type="primary" onClick={handleEnableEdit} style={{ background: '#4e0c1e' }}> <EditOutlined /> Editar informações </Button>,
             <Button key="delete" danger onClick={() => { Modal.confirm({ title: 'Excluir tarefa', content: 'Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.', okText: 'Sim, excluir', cancelText: 'Não, cancelar', okButtonProps: { style: { background: '#4e0c1e' }, danger: true }, centered: true, onOk: handleDelete, }); }}> <DeleteOutlined /> Excluir </Button>,
-        ]} width={700} style={{ top: 50 }}>
+        ]} style={{ top: 50 }}>
                 
             <Form form={form} layout="vertical" size="small" disabled={editingItem && !isEditMode}>
                     

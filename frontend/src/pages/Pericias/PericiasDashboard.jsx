@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, Row, Col, Statistic, Spin, Table, Select, message, Badge, Space } from 'antd';
+import { Card, Row, Col, Statistic, Spin, Table, Select, message, Space } from 'antd';
 import { CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { getPericiasDashboard, getPericiasHoje, getPericiasProximos } from '../../services/periciaService';
 import GraficoLinha from '../../components/Graficos/GraficoLinha';
@@ -7,14 +7,24 @@ import GraficoLinha from '../../components/Graficos/GraficoLinha';
 function PericiasDashboard() {
 
     const [loading, setLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
     const [data, setData] = useState(null);
     const [periciasHoje, setPericiasHoje] = useState([]);
     const [periciasProximos, setPericiasProximos] = useState([]);
     const [ano, setAno] = useState(new Date().getFullYear());
+    const anoAtual = new Date().getFullYear();
+    const anosOptions = [anoAtual - 3, anoAtual - 2, anoAtual - 1, anoAtual].map(y => ({ value: y, label: y }));
+
+    useEffect(() => {
+        const checkScreen = () => setIsMobile(window.innerWidth < 768);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     useEffect(() => {
         carregarDados();
-    }, []);
+    }, [ano]);
 
     const carregarDados = async () => {
 
@@ -23,7 +33,7 @@ function PericiasDashboard() {
         try {
 
             const [dashboard, hoje, proximos] = await Promise.all([
-                getPericiasDashboard(),
+                getPericiasDashboard(ano),
                 getPericiasHoje(),
                 getPericiasProximos(),
             ]);
@@ -54,14 +64,14 @@ function PericiasDashboard() {
 
     return (
     
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: isMobile ? 8 : 16 }}>
         
         <Row gutter={[12, 12]} style={{ marginBottom: 20 }}>
             
             <Col xs={12} sm={12} md={6}>
             
                 <Card size="small">
-                    <Statistic title="Total de perícias" value={data?.total || 0} prefix={<CalendarOutlined />} styles={{ content: { color: '#4e0c1e', fontSize: 20 } }} />
+                    <Statistic title="Total de perícias" value={data?.total || 0} prefix={<CalendarOutlined />} styles={{ content: { color: '#4e0c1e', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
             
             </Col>
@@ -69,7 +79,7 @@ function PericiasDashboard() {
             <Col xs={12} sm={12} md={6}>
                 
                 <Card size="small">
-                    <Statistic title="Agendadas" value={data?.agendadas || 0} prefix={<ClockCircleOutlined />} styles={{ content: { color: '#1890ff', fontSize: 20 } }} />
+                    <Statistic title="Agendadas" value={data?.agendadas || 0} prefix={<ClockCircleOutlined />} styles={{ content: { color: '#1890ff', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
             
             </Col>
@@ -77,7 +87,7 @@ function PericiasDashboard() {
             <Col xs={12} sm={12} md={6}>
                 
                 <Card size="small">
-                    <Statistic title="Concluídas" value={data?.concluidas || 0} prefix={<CheckCircleOutlined />} styles={{ content: { color: '#52c41a', fontSize: 20 } }} />
+                    <Statistic title="Concluídas" value={data?.concluidas || 0} prefix={<CheckCircleOutlined />} styles={{ content: { color: '#52c41a', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
             
             </Col>
@@ -85,7 +95,7 @@ function PericiasDashboard() {
             <Col xs={12} sm={12} md={6}>
                 
                 <Card size="small">
-                    <Statistic title="Canceladas" value={data?.canceladas || 0} prefix={<CloseCircleOutlined />} styles={{ content: { color: '#ff4d4f', fontSize: 20 } }} />
+                    <Statistic title="Canceladas" value={data?.canceladas || 0} prefix={<CloseCircleOutlined />} styles={{ content: { color: '#ff4d4f', fontSize: isMobile ? 16 : 20 } }} />
                 </Card>
             
             </Col>
@@ -96,7 +106,7 @@ function PericiasDashboard() {
             
             <Col xs={24} md={12}>
                 
-                <Card size="small" title={<Space><WarningOutlined style={{ color: '#faad14' }} /><span>Perícias para hoje</span></Space>}>
+                <Card size="small" title={<Space size={isMobile ? 'small' : 'middle'}><WarningOutlined style={{ color: '#faad14' }} /><span style={{ fontSize: isMobile ? 12 : 14 }}>Perícias para hoje</span></Space>}>
                     
                     {periciasHoje.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>Nenhuma perícia agendada para hoje</div>
@@ -119,7 +129,7 @@ function PericiasDashboard() {
             
             <Col xs={24} md={12}>
                 
-                <Card size="small" title={<Space><ClockCircleOutlined style={{ color: '#8b1a4a' }} /><span>Próximos 7 dias</span></Space>}>
+                <Card size="small" title={<Space size={isMobile ? 'small' : 'middle'}><ClockCircleOutlined style={{ color: '#8b1a4a' }} /><span style={{ fontSize: isMobile ? 12 : 14 }}>Próximos 7 dias</span></Space>}>
                     
                     {periciasProximos.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>Nenhuma perícia nos próximos 7 dias</div>
@@ -147,10 +157,10 @@ function PericiasDashboard() {
                 
                 <Card size="small">
                     
-                    <GraficoLinha data={data?.porMes} title="Perícias por mês" ano={ano} />
+                    <GraficoLinha data={data?.porMes} title="Perícias por mês" ano={ano} isMobile={isMobile} />
                     
                     <div style={{ textAlign: 'center', marginTop: 8 }}>
-                        <Select value={ano} onChange={setAno} size="small" style={{ width: 100 }} options={[2023, 2024, 2025, 2026].map(y => ({ value: y, label: y }))} />
+                        <Select value={ano} onChange={setAno} size="small" style={{ width: isMobile ? '80%' : 100 }} options={anosOptions} />
                     </div>
                 
                 </Card>

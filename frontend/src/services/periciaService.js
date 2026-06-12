@@ -25,9 +25,14 @@ export const deletePericia = async (id) => {
     await api.delete(`/pericias/${id}`);
 };
 
-export const getPericiasDashboard = async () => {
-    const response = await api.get('/pericias/dashboard');
+export const getPericiasDashboard = async (ano) => {
+   
+    const response = await api.get('/pericias/dashboard', {
+        params: { ano }
+    });
+   
     return response.data;
+
 };
 
 export const getPericiasHoje = async () => {

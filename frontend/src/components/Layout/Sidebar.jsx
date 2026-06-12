@@ -1,27 +1,43 @@
-import { useState } from 'react';
-import { Layout, Menu } from 'antd';
+import { useState, useEffect } from 'react';
+import { Layout, Menu, Drawer } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { DashboardOutlined, TeamOutlined, FolderOutlined, CalendarOutlined, DollarOutlined, CheckSquareOutlined, SettingOutlined, BarChartOutlined, UnorderedListOutlined, GiftOutlined, ScheduleOutlined, FileTextOutlined, AlertOutlined, SwapOutlined, WalletOutlined, MenuUnfoldOutlined, MenuFoldOutlined, } from '@ant-design/icons';
+import { DashboardOutlined, TeamOutlined, FolderOutlined, CalendarOutlined, DollarOutlined, CheckSquareOutlined, SettingOutlined, BarChartOutlined, UnorderedListOutlined, GiftOutlined, ScheduleOutlined, FileTextOutlined, SwapOutlined, WalletOutlined, MenuUnfoldOutlined, MenuFoldOutlined, MenuOutlined} from '@ant-design/icons';
 import './AppLayout.css';
 
 const { Sider } = Layout;
 
-function Sidebar({ onCollapseChange }) {
+function Sidebar({ onCollapseChange, isMobile }) {
   
   const navigate = useNavigate();
   const location = useLocation();
   
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    
+    if (isMobile) {
+      setCollapsed(true);
+      if (onCollapseChange) onCollapseChange(true);
+    }
+
+  }, [isMobile]);
 
   const toggleCollapsed = () => {
     
-    const newState = !collapsed;
-    setCollapsed(newState);
-
-    if (onCollapseChange) {
-      onCollapseChange(newState);
+    if (isMobile) {
+      setMobileOpen(!mobileOpen);
+    } else {
+      const newState = !collapsed;
+      setCollapsed(newState);
+      if (onCollapseChange) onCollapseChange(newState);
     }
 
+  };
+
+  const handleMenuClick = (path) => {
+    navigate(path);
+    if (isMobile) setMobileOpen(false);
   };
 
   const menuItems = [
@@ -89,6 +105,25 @@ function Sidebar({ onCollapseChange }) {
     { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações', onClick: () => navigate('/configuracoes'), },
 
   ];
+
+  if (isMobile) {
+    
+    return (
+    
+    <>
+      
+      <div style={{ position: 'fixed', top: 0, left: 0, zIndex: 1000, padding: 16, cursor: 'pointer', background: '#4e0c1e', borderRadius: '0 0 8px 0' }} onClick={toggleCollapsed}>
+        <MenuOutlined style={{ fontSize: 20, color: '#fff' }} />
+      </div>
+      
+      <Drawer placement="left" closable={true} onClose={() => setMobileOpen(false)} open={mobileOpen} size={250} styles={{ body: { padding: 0, background: 'linear-gradient(180deg, #4e0c1e 0%, #350511 100%)' } }}>
+        <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]} defaultOpenKeys={[]} items={menuItems} style={{ background: 'transparent', fontFamily: 'Poppins, sans-serif', height: '100vh' }} />
+      </Drawer>
+    
+    </>
+    );
+
+  }
 
   return (
   
