@@ -188,14 +188,13 @@ function ClientesLista() {
 
     };
 
-    const handleSearch = () => {
+    const handleSearch = (e) => {   
         
-        if (pagination.current === 1) {
-            carregarDados();
-        } else {
-            setPagination((prev) => ({ ...prev, current: 1 }));
-        }
-
+        const value = e.target.value;
+        
+        setSearchText(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    
     };
 
     const handleReset = () => {
@@ -399,7 +398,7 @@ function ClientesLista() {
                 <Col xs={24} md={12}>
                 
                 <Space wrap orientation={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
-                    <Input placeholder="Buscar por nome ou CPF/CNPJ" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: isMobile ? '100%' : 250 }} prefix={<SearchOutlined />} />
+                    <Input placeholder="Buscar por nome ou CPF/CNPJ" value={searchText} onChange={handleSearch} style={{ width: isMobile ? '100%' : 250 }} prefix={<SearchOutlined />} />
                     <Button type="primary" onClick={handleSearch} icon={<SearchOutlined />} style={{ background: '#4e0c1e', width: isMobile ? '100%' : 'auto' }}> Buscar </Button>
                     <Button onClick={handleReset} icon={<ReloadOutlined />} style={{ width: isMobile ? '100%' : 'auto' }}> Limpar </Button>
                 </Space>
