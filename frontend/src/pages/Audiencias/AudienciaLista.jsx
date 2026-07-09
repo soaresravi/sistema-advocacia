@@ -269,6 +269,33 @@ function AudienciaLista() {
 
     };
 
+    const handleSearch = () => {
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+
+    const handleReset = () => {
+        setSearchText('');
+        setFiltroStatus(null);
+        setFiltroDataInicio(null);
+        setFiltroDataFim(null);
+        setPagination({ current: 1, pageSize: 10, total: 0 });
+    };
+    
+    const handleStatusChange = (value) => {
+        setFiltroStatus(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+    
+    const handleDataInicioChange = (value) => {
+        setFiltroDataInicio(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+    
+    const handleDataFimChange = (value) => {
+        setFiltroDataFim(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+
     const columns = [
         
         { title: 'ID', dataIndex: 'id', width: 70 },
@@ -322,18 +349,12 @@ function AudienciaLista() {
                                 
                         <Space wrap>
                                 
-                            <Input placeholder="Buscar por processo ou detalhes" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 200 }} prefix={<SearchOutlined />} />
-                            <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_EVENTO_OPTIONS} />
-                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" />
-                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" />
+                            <Input placeholder="Buscar por processo ou detalhes" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
+                            <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={handleStatusChange} options={STATUS_EVENTO_OPTIONS} />
+                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={handleDataInicioChange} size="small" />
+                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={handleDataFimChange} size="small" />
                                     
-                            <Button onClick={() => {
-                                setSearchText('');
-                                setFiltroStatus(null);
-                                setFiltroDataInicio(null);
-                                setFiltroDataFim(null);
-                                setPagination({ ...pagination, current: 1 });
-                            }} icon={<ReloadOutlined />}> Limpar </Button>
+                            <Button onClick={handleReset} icon={<ReloadOutlined />}> Limpar </Button>
                                 
                         </Space>
                     
@@ -353,7 +374,7 @@ function AudienciaLista() {
                     <div style={{ marginBottom: 16 }}>
         
                         <Space orientation="vertical" style={{ width: '100%' }} size="small">
-                            <Input placeholder="Buscar por processo ou detalhes" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por processo ou detalhes" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
                             <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%' }}> Filtros </Button>
                             <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Nova audiência </Button>
                         </Space>
@@ -364,14 +385,12 @@ function AudienciaLista() {
                         
                         <Space orientation="vertical" style={{ width: '100%' }} size="middle">
                         
-                            <Select placeholder="Status" allowClear style={{ width: '100%' }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_EVENTO_OPTIONS} />
-                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" style={{ width: '100%' }} />
-                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" style={{ width: '100%' }} />
+                            <Select placeholder="Status" allowClear style={{ width: '100%' }} value={filtroStatus} onChange={handleStatusChange} options={STATUS_EVENTO_OPTIONS} />
+                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={handleDataInicioChange} size="small" style={{ width: '100%' }} />
+                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={handleDataFimChange} size="small" style={{ width: '100%' }} />
                         
                             <Button onClick={() => {
-                                setFiltroStatus(null);
-                                setFiltroDataInicio(null);
-                                setFiltroDataFim(null);
+                                handleReset();
                                 setFiltersDrawerOpen(false);
                             }} style={{ width: '100%' }}> Limpar filtros </Button>
 

@@ -365,6 +365,27 @@ function TarefaLista() {
 
     };
 
+    const handleSearch = () => {
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+
+    const handleReset = () => {
+        setSearchText('');
+        setFiltroStatus(null);
+        setFiltroUrgencia(null);
+        setPagination({ current: 1, pageSize: 10, total: 0 });
+    };
+    
+    const handleStatusChange = (value) => {
+        setFiltroStatus(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+    
+    const handleUrgenciaChange = (value) => {
+        setFiltroUrgencia(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+
     const columns = [
 
         { title: 'Tarefa', dataIndex: 'tarefa', ellipsis: true, width: 200 },
@@ -412,17 +433,12 @@ function TarefaLista() {
                         
                         <Space wrap>
                                     
-                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 220 }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 220 }} prefix={<SearchOutlined />} />
                             
-                            <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_TAREFA_OPTIONS} />
-                            <Select placeholder="Urgência" allowClear style={{ width: 140 }} value={filtroUrgencia} onChange={setFiltroUrgencia} options={URGENCIA_TAREFA_OPTIONS} />
+                            <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={handleStatusChange} options={STATUS_TAREFA_OPTIONS} />
+                            <Select placeholder="Urgência" allowClear style={{ width: 140 }} value={filtroUrgencia} onChange={handleUrgenciaChange} options={URGENCIA_TAREFA_OPTIONS} />
                                     
-                            <Button onClick={() => {
-                                setSearchText('');
-                                setFiltroStatus(null);
-                                setFiltroUrgencia(null);
-                                setPagination({ ...pagination, current: 1 });
-                            }} icon={<ReloadOutlined />}>Limpar</Button>
+                            <Button onClick={handleReset} icon={<ReloadOutlined />}>Limpar</Button>
             
                         </Space>
             
@@ -442,7 +458,7 @@ function TarefaLista() {
                     <div style={{ marginBottom: 16 }}>
                     
                         <Space orientation="vertical" style={{ width: '100%' }} size="small">
-                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
                             <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
                             <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Nova tarefa </Button>
                         </Space>
@@ -453,12 +469,11 @@ function TarefaLista() {
                         
                         <Space orientation="vertical" style={{ width: '100%' }} size="middle">
                             
-                            <Select placeholder="Status" allowClear style={{ width: '100%' }} value={filtroStatus} onChange={setFiltroStatus} options={STATUS_TAREFA_OPTIONS} />
-                            <Select placeholder="Urgência" allowClear style={{ width: '100%' }} value={filtroUrgencia} onChange={setFiltroUrgencia} options={URGENCIA_TAREFA_OPTIONS} />
+                            <Select placeholder="Status" allowClear style={{ width: '100%' }} value={filtroStatus} onChange={handleStatusChange} options={STATUS_TAREFA_OPTIONS} />
+                            <Select placeholder="Urgência" allowClear style={{ width: '100%' }} value={filtroUrgencia} onChange={handleUrgenciaChange} options={URGENCIA_TAREFA_OPTIONS} />
                             
                             <Button onClick={() => {
-                                setFiltroStatus(null);
-                                setFiltroUrgencia(null);
+                                handleReset();
                                 setFiltersDrawerOpen(false);
                             }} style={{ width: '100%' }}> Limpar filtros </Button>
                             

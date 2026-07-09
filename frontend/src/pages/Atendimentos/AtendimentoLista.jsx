@@ -248,6 +248,39 @@ function AtendimentoLista() {
 
   };
 
+  const handleSearch = () => {
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+  
+  const handleReset = () => {
+    setSearchText('');
+    setFiltroClienteNovo(null);
+    setFiltroFechouContrato(null);
+    setFiltroDataInicio(null);
+    setFiltroDataFim(null);
+    setPagination({ current: 1, pageSize: 10, total: 0 });
+  };
+  
+  const handleClienteNovoChange = (value) => {
+    setFiltroClienteNovo(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+  
+  const handleFechouContratoChange = (value) => {
+    setFiltroFechouContrato(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+  
+  const handleDataInicioChange = (value) => {
+    setFiltroDataInicio(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+
+  const handleDataFimChange = (value) => {
+    setFiltroDataFim(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+
   const columns = [
 
     { title: 'ID', dataIndex: 'id', width: 70 },
@@ -292,22 +325,15 @@ function AtendimentoLista() {
                 
             <Space wrap>
                   
-              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 200 }} prefix={<SearchOutlined />} />
+              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
     
-              <Select placeholder="Cliente novo?" allowClear style={{ width: 120 }} value={filtroClienteNovo} onChange={setFiltroClienteNovo} options={SIM_NAO_OPTIONS} />
-              <Select placeholder="Fechou contrato?" allowClear style={{ width: 130 }} value={filtroFechouContrato} onChange={setFiltroFechouContrato} options={SIM_NAO_OPTIONS} />
+              <Select placeholder="Cliente novo?" allowClear style={{ width: 120 }} value={filtroClienteNovo} onChange={handleClienteNovoChange} options={SIM_NAO_OPTIONS} />
+              <Select placeholder="Fechou contrato?" allowClear style={{ width: 130 }} value={filtroFechouContrato} onChange={handleFechouContratoChange} options={SIM_NAO_OPTIONS} />
           
-              <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" />
-              <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" />
+              <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={handleDataInicioChange} size="small" />
+              <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={handleDataFimChange} size="small" />
                   
-              <Button onClick={() => {
-                setSearchText('');
-                setFiltroClienteNovo(null);
-                setFiltroFechouContrato(null);
-                setFiltroDataInicio(null);
-                setFiltroDataFim(null);
-                setPagination({ ...pagination, current: 1 });
-              }} icon={<ReloadOutlined />}> Limpar </Button>
+              <Button onClick={handleReset} icon={<ReloadOutlined />}> Limpar </Button>
       
             </Space>
       
@@ -328,7 +354,7 @@ function AtendimentoLista() {
           <div style={{ marginBottom: 16 }}>
             
             <Space orientation="vertical" style={{ width: '100%' }} size="small">
-              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
               <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
               <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Novo atendimento </Button>
             </Space>
@@ -339,17 +365,14 @@ function AtendimentoLista() {
             
             <Space orientation="vertical" style={{ width: '100%' }} size="middle">
               
-              <Select placeholder="Cliente novo?" allowClear style={{ width: '100%' }} value={filtroClienteNovo} onChange={setFiltroClienteNovo} options={SIM_NAO_OPTIONS} />
-              <Select placeholder="Fechou contrato?" allowClear style={{ width: '100%' }} value={filtroFechouContrato} onChange={setFiltroFechouContrato} options={SIM_NAO_OPTIONS} />
+              <Select placeholder="Cliente novo?" allowClear style={{ width: '100%' }} value={filtroClienteNovo} onChange={handleClienteNovoChange} options={SIM_NAO_OPTIONS} />
+              <Select placeholder="Fechou contrato?" allowClear style={{ width: '100%' }} value={filtroFechouContrato} onChange={handleFechouContratoChange} options={SIM_NAO_OPTIONS} />
               
-              <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" style={{ width: '100%' }} />
-              <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" style={{ width: '100%' }} />
+              <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={handleDataInicioChange} size="small" style={{ width: '100%' }} />
+              <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={handleDataFimChange} size="small" style={{ width: '100%' }} />
               
               <Button onClick={() => {
-                setFiltroClienteNovo(null);
-                setFiltroFechouContrato(null);
-                setFiltroDataInicio(null);
-                setFiltroDataFim(null);
+                handleReset();
                 setFiltersDrawerOpen(false);
               }} style={{ width: '100%' }}> Limpar filtros </Button>
               

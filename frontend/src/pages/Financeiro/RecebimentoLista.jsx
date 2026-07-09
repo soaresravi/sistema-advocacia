@@ -248,6 +248,45 @@ function RecebimentoLista() {
 
     };
 
+    const handleSearch = () => {
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+
+    const handleReset = () => {
+        setSearchText('');
+        setFiltroTipo(null);
+        setFiltroTipoCliente(null);
+        setFiltroRecebido(null);
+        setFiltroDataInicio(null);
+        setFiltroDataFim(null);
+        setPagination({ current: 1, pageSize: 10, total: 0 });
+    };
+
+    const handleTipoChange = (value) => {
+        setFiltroTipo(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+    
+    const handleTipoClienteChange = (value) => {
+        setFiltroTipoCliente(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+    
+    const handleRecebidoChange = (value) => {
+        setFiltroRecebido(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+    
+    const handleDataInicioChange = (value) => {
+        setFiltroDataInicio(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+    
+    const handleDataFimChange = (value) => {
+        setFiltroDataFim(value);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+    };
+
     const columns = [
         
         { title: 'ID', dataIndex: 'id', width: 70 },
@@ -310,24 +349,16 @@ function RecebimentoLista() {
                                 
                         <Space wrap>
                                     
-                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: 200 }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
                     
-                            <Select placeholder="Tipo" allowClear style={{ width: 120 }} value={filtroTipo} onChange={setFiltroTipo} options={TIPO_RECEBIMENTO_OPTIONS} />
-                            <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={setFiltroTipoCliente} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
-                            <Select placeholder="Recebido?" allowClear style={{ width: 100 }} value={filtroRecebido} onChange={setFiltroRecebido} options={SIM_NAO_OPTIONS} />
+                            <Select placeholder="Tipo" allowClear style={{ width: 120 }} value={filtroTipo} onChange={handleTipoChange} options={TIPO_RECEBIMENTO_OPTIONS} />
+                            <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={handleTipoClienteChange} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
+                            <Select placeholder="Recebido?" allowClear style={{ width: 100 }} value={handleRecebidoChange} onChange={setFiltroRecebido} options={SIM_NAO_OPTIONS} />
                             
-                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" />
-                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" />
+                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={handleDataInicioChange} size="small" />
+                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={handleDataFimChange} size="small" />
                                     
-                            <Button onClick={() => {
-                                setSearchText('');
-                                setFiltroTipo(null);
-                                setFiltroTipoCliente(null);
-                                setFiltroRecebido(null);
-                                setFiltroDataInicio(null);
-                                setFiltroDataFim(null);
-                                setPagination({ ...pagination, current: 1 });
-                            }} icon={<ReloadOutlined />}>Limpar</Button>
+                            <Button onClick={handleReset} icon={<ReloadOutlined />}>Limpar</Button>
                                 
                         </Space>
                             
@@ -347,7 +378,7 @@ function RecebimentoLista() {
                     <div style={{ marginBottom: 16 }}>
                         
                         <Space orientation="vertical" style={{ width: '100%' }} size="small">
-                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={() => setPagination({ ...pagination, current: 1 })} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
                             <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e'}}> Filtros </Button>
                             <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Novo recebimento </Button>
                         </Space>
@@ -358,19 +389,15 @@ function RecebimentoLista() {
                         
                         <Space orientation="vertical" style={{ width: '100%' }} size="middle">
           
-                            <Select placeholder="Tipo" allowClear style={{ width: '100%' }} value={filtroTipo} onChange={setFiltroTipo} options={TIPO_RECEBIMENTO_OPTIONS} />
-                            <Select placeholder="Tipo de cliente" allowClear style={{ width: '100%' }} value={filtroTipoCliente} onChange={setFiltroTipoCliente} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
-                            <Select placeholder="Recebido?" allowClear style={{ width: '100%' }} value={filtroRecebido} onChange={setFiltroRecebido} options={SIM_NAO_OPTIONS} />
+                            <Select placeholder="Tipo" allowClear style={{ width: '100%' }} value={filtroTipo} onChange={handleTipoChange} options={TIPO_RECEBIMENTO_OPTIONS} />
+                            <Select placeholder="Tipo de cliente" allowClear style={{ width: '100%' }} value={filtroTipoCliente} onChange={handleTipoClienteChange} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
+                            <Select placeholder="Recebido?" allowClear style={{ width: '100%' }} value={filtroRecebido} onChange={handleRecebidoChange} options={SIM_NAO_OPTIONS} />
                             
-                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={setFiltroDataInicio} size="small" style={{ width: '100%' }} />
-                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={setFiltroDataFim} size="small" style={{ width: '100%' }} />
+                            <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={handleDataInicioChange} size="small" style={{ width: '100%' }} />
+                            <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={handleDataFimChange} size="small" style={{ width: '100%' }} />
                             
                             <Button onClick={() => {
-                                setFiltroTipo(null);
-                                setFiltroTipoCliente(null);
-                                setFiltroRecebido(null);
-                                setFiltroDataInicio(null);
-                                setFiltroDataFim(null);
+                                handleReset();
                                 setFiltersDrawerOpen(false);
                             }} style={{ width: '100%' }}> Limpar filtros </Button>
                             
