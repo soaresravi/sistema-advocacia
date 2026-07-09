@@ -248,8 +248,13 @@ function RecebimentoLista() {
 
     };
 
-    const handleSearch = () => {
+    const handleSearch = (e) => {   
+        
+        const value = e.target.value;
+        
+        setSearchText(value);
         setPagination((prev) => ({ ...prev, current: 1 }));
+    
     };
 
     const handleReset = () => {
@@ -349,7 +354,7 @@ function RecebimentoLista() {
                                 
                         <Space wrap>
                                     
-                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
                     
                             <Select placeholder="Tipo" allowClear style={{ width: 120 }} value={filtroTipo} onChange={handleTipoChange} options={TIPO_RECEBIMENTO_OPTIONS} />
                             <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={handleTipoClienteChange} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
@@ -378,7 +383,7 @@ function RecebimentoLista() {
                     <div style={{ marginBottom: 16 }}>
                         
                         <Space orientation="vertical" style={{ width: '100%' }} size="small">
-                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por cliente ou processo" value={searchText} onChange={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
                             <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e'}}> Filtros </Button>
                             <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Novo recebimento </Button>
                         </Space>
@@ -475,7 +480,7 @@ function RecebimentoLista() {
             )}
             
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                Total: {pagination.total} recebimento(s) | Valor total: R$ {totalRecebimentos.toLocaleString('pt-BR')}
+                Total: {data.length} de {pagination.total} recebimento{pagination.total !== 1 ? 's' : ''} | Valor total: R$ {totalRecebimentos.toLocaleString('pt-BR')}
             </div>
 
         </Card>

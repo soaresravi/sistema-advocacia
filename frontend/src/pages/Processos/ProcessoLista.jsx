@@ -488,8 +488,13 @@ function ProcessosLista() {
 
     };
 
-    const handleSearch = () => {
+    const handleSearch = (e) => {   
+        
+        const value = e.target.value;
+        
+        setSearchText(value);
         setPagination((prev) => ({ ...prev, current: 1 }));
+    
     };
 
     const handleReset = () => {
@@ -949,7 +954,7 @@ function ProcessosLista() {
                     <>
                     
                         <Space style={{ width: '100%' }} orientation="vertical">              
-                            <Input placeholder="Buscar por nº processo ou cliente" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por nº processo ou cliente" value={searchText} onChange={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
                             <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
                         </Space>
                         
@@ -965,7 +970,7 @@ function ProcessosLista() {
                     
                     <Space wrap>
                        
-                       <Input placeholder="Buscar por nº processo ou cliente" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 250 }} prefix={<SearchOutlined />} />
+                       <Input placeholder="Buscar por nº processo ou cliente" value={searchText} onChange={handleSearch} style={{ width: 250 }} prefix={<SearchOutlined />} />
                        
                        <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={handleStatusChange} options={STATUS_PROCESSO_OPTIONS} />
                        <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={handleTipoClienteChange} options={[{ value: 'PF', label: 'Pessoa Física' }, { value: 'PJ', label: 'Pessoa Jurídica' }]} />
@@ -1103,9 +1108,9 @@ function ProcessosLista() {
                     )}
                 </div>
             )}
-
+            
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                Total: {pagination.total} processo{pagination.total !== 1 ? 's' : ''}
+                Total: {data.length} de {pagination.total} processo{pagination.total !== 1 ? 's' : ''}
             </div>
 
         </Card>

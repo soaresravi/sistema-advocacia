@@ -269,8 +269,13 @@ function PericiaLista() {
 
     };
 
-    const handleSearch = () => {
+    const handleSearch = (e) => {   
+        
+        const value = e.target.value;
+        
+        setSearchText(value);
         setPagination((prev) => ({ ...prev, current: 1 }));
+    
     };
 
     const handleReset = () => {
@@ -349,7 +354,7 @@ function PericiaLista() {
                                 
                         <Space wrap>
                                     
-                            <Input placeholder="Buscar por processo ou detalhes" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por processo ou detalhes" value={searchText} onChange={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
                             <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={handleStatusChange} options={STATUS_EVENTO_OPTIONS} />
                             <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={handleDataInicioChange} size="small" />
                             <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={handleDataFimChange} size="small" />
@@ -375,7 +380,7 @@ function PericiaLista() {
                     <div style={{ marginBottom: 16 }}>
                         
                         <Space orientation="vertical" style={{ width: '100%' }} size="small">
-                            <Input placeholder="Buscar por processo ou detalhes" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por processo ou detalhes" value={searchText} onChange={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
                             <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%' }}> Filtros </Button>
                             <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Nova perícia </Button>
                         </Space>
@@ -482,9 +487,9 @@ function PericiaLista() {
                     )}
                 </div>
             )}
-
+            
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                Total: {pagination.total} perícia{pagination.total !== 1 ? 's' : ''}
+                Total: {data.length} de {pagination.total} perícia{pagination.total !== 1 ? 's' : ''}
             </div>
 
         </Card>

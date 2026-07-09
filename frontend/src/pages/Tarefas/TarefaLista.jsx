@@ -365,8 +365,13 @@ function TarefaLista() {
 
     };
 
-    const handleSearch = () => {
+    const handleSearch = (e) => {   
+        
+        const value = e.target.value;
+        
+        setSearchText(value);
         setPagination((prev) => ({ ...prev, current: 1 }));
+    
     };
 
     const handleReset = () => {
@@ -433,7 +438,7 @@ function TarefaLista() {
                         
                         <Space wrap>
                                     
-                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 220 }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={handleSearch} style={{ width: 220 }} prefix={<SearchOutlined />} />
                             
                             <Select placeholder="Status" allowClear style={{ width: 120 }} value={filtroStatus} onChange={handleStatusChange} options={STATUS_TAREFA_OPTIONS} />
                             <Select placeholder="Urgência" allowClear style={{ width: 140 }} value={filtroUrgencia} onChange={handleUrgenciaChange} options={URGENCIA_TAREFA_OPTIONS} />
@@ -458,7 +463,7 @@ function TarefaLista() {
                     <div style={{ marginBottom: 16 }}>
                     
                         <Space orientation="vertical" style={{ width: '100%' }} size="small">
-                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por tarefa, cliente ou processo" value={searchText} onChange={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
                             <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
                             <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Nova tarefa </Button>
                         </Space>
@@ -567,9 +572,9 @@ function TarefaLista() {
                     )}
                 </div>
             )}
-
+            
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                Total: {pagination.total} tarefa{pagination.total !== 1 ? 's' : ''}
+                Total: {data.length} de {pagination.total} tarefa{pagination.total !== 1 ? 's' : ''}
             </div>
 
         </Card>

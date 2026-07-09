@@ -248,8 +248,13 @@ function AtendimentoLista() {
 
   };
 
-  const handleSearch = () => {
+  const handleSearch = (e) => {   
+        
+    const value = e.target.value;
+    
+    setSearchText(value);
     setPagination((prev) => ({ ...prev, current: 1 }));
+
   };
   
   const handleReset = () => {
@@ -325,7 +330,7 @@ function AtendimentoLista() {
                 
             <Space wrap>
                   
-              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
+              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
     
               <Select placeholder="Cliente novo?" allowClear style={{ width: 120 }} value={filtroClienteNovo} onChange={handleClienteNovoChange} options={SIM_NAO_OPTIONS} />
               <Select placeholder="Fechou contrato?" allowClear style={{ width: 130 }} value={filtroFechouContrato} onChange={handleFechouContratoChange} options={SIM_NAO_OPTIONS} />
@@ -354,7 +359,7 @@ function AtendimentoLista() {
           <div style={{ marginBottom: 16 }}>
             
             <Space orientation="vertical" style={{ width: '100%' }} size="small">
-              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+              <Input placeholder="Buscar por nome, assunto ou telefone" value={searchText} onChange={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
               <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
               <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Novo atendimento </Button>
             </Space>
@@ -520,9 +525,9 @@ function AtendimentoLista() {
           )}
         </div>
       )}
-
+      
       <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-        Total: {pagination.total} atendimento{pagination.total !== 1 ? 's' : ''}
+        Total: {data.length} de {pagination.total} atendimento{pagination.total !== 1 ? 's' : ''}
       </div>
       
     </Card>

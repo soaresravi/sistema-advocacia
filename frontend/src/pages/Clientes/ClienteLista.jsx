@@ -384,8 +384,6 @@ function ClientesLista() {
         ), },
 
     ];
-    
-    const totalClientes = data.length;
 
     return (
     
@@ -498,7 +496,7 @@ function ClientesLista() {
                     )}
                     
                     <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                        Total: {totalClientes} cliente{totalClientes !== 1 ? 's' : ''}
+                        Total: {data.length} de {pagination.total} cliente{pagination.total !== 1 ? 's' : ''}
                     </div>
                     
                 </> )},
@@ -583,7 +581,7 @@ function ClientesLista() {
                     )}
                     
                     <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                        Total: {totalClientes} cliente{totalClientes !== 1 ? 's' : ''}
+                        Total: {data.length} de {pagination.total} cliente{pagination.total !== 1 ? 's' : ''}
                     </div>
 
                 </> )},

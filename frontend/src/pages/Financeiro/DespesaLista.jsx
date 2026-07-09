@@ -233,8 +233,13 @@ function DespesaLista() {
 
     };
 
-    const handleSearch = () => {
+    const handleSearch = (e) => {   
+        
+        const value = e.target.value;
+        
+        setSearchText(value);
         setPagination((prev) => ({ ...prev, current: 1 }));
+    
     };
 
     const handleReset = () => {
@@ -328,7 +333,7 @@ function DespesaLista() {
                         
                         <Space wrap>
                                     
-                            <Input placeholder="Buscar por despesa ou detalhes" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por despesa ou detalhes" value={searchText} onChange={handleSearch} style={{ width: 200 }} prefix={<SearchOutlined />} />
                     
                             <Select placeholder="Categoria" allowClear style={{ width: 140 }} value={filtroCategoria} onChange={handleCategoriaChange} options={CATEGORIA_DESPESA_OPTIONS} />
                             <Select placeholder="Pago?" allowClear style={{ width: 100 }} value={filtroPago} onChange={handlePagoChange} options={SIM_NAO_OPTIONS} />
@@ -356,7 +361,7 @@ function DespesaLista() {
                     <div style={{ marginBottom: 16 }}>
                         
                         <Space orientation="vertical" style={{ width: '100%' }} size="small">
-                            <Input placeholder="Buscar por despesa ou detalhes" value={searchText} onChange={(e) => setSearchText(e.target.value)} onPressEnter={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
+                            <Input placeholder="Buscar por despesa ou detalhes" value={searchText} onChange={handleSearch} style={{ width: '100%' }} prefix={<SearchOutlined />} />
                             <Button icon={<SearchOutlined />} onClick={() => setFiltersDrawerOpen(true)} style={{ width: '100%', color: '#4e0c1e' }}> Filtros </Button>
                             <Button type="primary" onClick={handleAdd} icon={<PlusOutlined />} style={{ background: '#4e0c1e', width: '100%' }}> Nova despesa </Button>
                         </Space>
@@ -449,7 +454,7 @@ function DespesaLista() {
             )}
         
             <div style={{ marginTop: 16, textAlign: 'right', fontWeight: 'bold' }}>
-                Total: {pagination.total} despesa(s) | Valor total: R$ {totalDespesas.toLocaleString('pt-BR')}
+                Total: {data.length} de {pagination.total} despesa{pagination.total !== 1 ? 's' : ''} | Valor total: R$ {totalDespesas.toLocaleString('pt-BR')}
             </div>
 
         </Card>
