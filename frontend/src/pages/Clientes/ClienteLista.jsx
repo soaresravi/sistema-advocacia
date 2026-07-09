@@ -189,12 +189,12 @@ function ClientesLista() {
     };
 
     const handleSearch = () => {
-        setPagination({ ...pagination, current: 1 });
+        setPagination((prev) => ({ ...prev, current: 1 }));
     };
 
     const handleReset = () => {
         setSearchText('');
-        setPagination({ ...pagination, current: 1 });
+        setPagination({ current: 1, pageSize: 10, total: 0 });
     };
 
     const handleViewDetails = (record) => {
