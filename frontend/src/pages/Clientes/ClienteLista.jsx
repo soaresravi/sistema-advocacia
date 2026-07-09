@@ -83,7 +83,7 @@ function ClientesLista() {
 
     useEffect(() => {
         carregarDados();
-    }, [activeTab, pagination.current, pagination.pageSize, searchText]);
+    }, [activeTab, pagination.current, pagination.pageSize]);
 
     const carregarEstados = async () => {
 
@@ -190,6 +190,7 @@ function ClientesLista() {
 
     const handleSearch = () => {
         setPagination((prev) => ({ ...prev, current: 1 }));
+        setSearchText(searchText);
     };
 
     const handleReset = () => {
