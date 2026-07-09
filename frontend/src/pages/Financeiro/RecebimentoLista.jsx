@@ -358,7 +358,7 @@ function RecebimentoLista() {
                     
                             <Select placeholder="Tipo" allowClear style={{ width: 120 }} value={filtroTipo} onChange={handleTipoChange} options={TIPO_RECEBIMENTO_OPTIONS} />
                             <Select placeholder="Tipo de cliente" allowClear style={{ width: 120 }} value={filtroTipoCliente} onChange={handleTipoClienteChange} options={[{ value: 'PF', label: 'PF' }, { value: 'PJ', label: 'PJ' }]} />
-                            <Select placeholder="Recebido?" allowClear style={{ width: 100 }} value={handleRecebidoChange} onChange={setFiltroRecebido} options={SIM_NAO_OPTIONS} />
+                            <Select placeholder="Recebido?" allowClear style={{ width: 100 }} value={filtroRecebido} onChange={handleRecebidoChange} options={SIM_NAO_OPTIONS} />
                             
                             <DatePicker placeholder="Data do início" format="DD/MM/YYYY" onChange={handleDataInicioChange} size="small" />
                             <DatePicker placeholder="Data do fim" format="DD/MM/YYYY" onChange={handleDataFimChange} size="small" />
