@@ -217,9 +217,18 @@ function ProcessosLista() {
 
             const statusBackend = record.status?.descricao || record.status;
             const faseBackend = record.fase?.descricao || record.fase;
+
+            let idsSelecionados = [];
+            
+            if (record.clientes && record.clientes.length > 0) {
+                idsSelecionados = record.clientes.map(c => c.clienteId);
+            } else if (record.clienteId) {
+                idsSelecionados = [record.clienteId];
+            }
             
             form.setFieldsValue({
                 ...record,
+                clienteIds: idsSelecionados,
                 status: FRONTEND_CONVERT[statusBackend] || statusBackend,
                 fase: FRONTEND_CONVERT[faseBackend] || faseBackend,
                 tipoAcao: formatarTipoAcao(record.tipoAcao),
@@ -273,8 +282,24 @@ function ProcessosLista() {
             const values = await form.validateFields();
             setModalLoading(true);
 
+            const listaClientes = (values.clienteIds || []).map(id => {
+
+                const clientePf = clientesOptions.pf.find(c => c.id === id);
+                const clientePj = clientesOptions.pj.find(c => c.id === id);
+                const clienteEncontrado = clientePf || clientePj;
+            
+                return {
+                    clienteId: id,
+                    clienteNome: clienteEncontrado ? clienteEncontrado.nome : '',
+                    tipoCliente: clientePf ? 'PF' : 'PJ',
+                    qualificacao: values.qualificacao 
+                };
+
+            });
+
             const dataToSend = {
                 ...values,
+                clientes: listaClientes,
                 status: BACKEND_CONVERT[values.status] || values.status,
                 fase: BACKEND_CONVERT[values.fase] || values.fase,
                 dataInicio: values.dataInicio ? values.dataInicio.format('YYYY-MM-DD') : null,
@@ -593,20 +618,8 @@ function ProcessosLista() {
     
                                 return (
                                     
-                                    <Form.Item name="clienteId" label="Cliente">
-                                        
-                                        <Select size="small" showSearch={{ filterOption: (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) }} placeholder="Selecione o cliente" loading={clientesOptions.pf.length === 0 && clientesOptions.pj.length === 0} options={currentOptions}
-                                        
-                                        onChange={(value, option) => {
-                                            
-                                            setFieldValue('clienteNome', option.label);
-                                            
-                                            if (!getFieldValue('tipoCliente') && option.type) {
-                                                setFieldValue('tipoCliente', option.type);
-                                            }
-                                        
-                                        }} />
-                                    
+                                    <Form.Item name="clienteIds" label="Cliente(s)">
+                                        <Select mode="multiple" size="small" showSearch={{ filterOption: (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase()) }} placeholder="Selecione um ou mais clientes" loading={clientesOptions.pf.length === 0 && clientesOptions.pj.length === 0} options={currentOptions} />
                                     </Form.Item>
 
                                 );
@@ -923,7 +936,30 @@ function ProcessosLista() {
             return encontrado ? encontrado.label : (valorReal || '-');
         }},
 
-        { title: 'Cliente', dataIndex: 'clienteNome', width: 150 },
+        { title: 'Cliente', dataIndex: 'clienteNome', width: 150, render: (text, record) => {
+                        
+            if (record.clientes && record.clientes.length > 0) {
+                
+                const nomes = record.clientes.map(c => {
+
+                    if (!c.clienteNome && c.clienteId) {     
+                        const cliente = [...clientesOptions.pf, ...clientesOptions.pj].find(cl => cl.id === c.clienteId);
+                        return cliente?.nome || '';
+                    }
+                    
+                    return c.clienteNome || '';
+                
+                }).filter(Boolean);
+                
+                if (nomes.length === 1) return nomes[0];
+                if (nomes.length > 1) return `${nomes[0]} +${nomes.length - 1}`;
+           
+            }
+
+            return text || '-';
+
+        }},
+        
         { title: 'Tipo de cliente', dataIndex: 'tipoCliente', width: 100 },
         { title: 'Valor da causa', dataIndex: 'valorCausa', width: 120, render: (value) => value ? `R$ ${value.toLocaleString('pt-BR')}` : '-' },
         
