@@ -4,15 +4,16 @@ import com.advocacia.enums.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProcessoResponse {
     public Long id;
     public String numeroProcesso;
     public StatusProcesso status;
-    public String tipoAcao;
-    public String tipoCliente;
+    public String tipoAcao, tipoCliente;
     public Long clienteId;
     public String clienteNome;
+    public List<ClienteProcessoDTO> clientes;
     public Qualificacao qualificacao;
     public Boolean prazoAberto;
     public LocalDate dataPrazo;

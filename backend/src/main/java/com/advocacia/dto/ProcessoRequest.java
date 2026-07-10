@@ -4,6 +4,7 @@ import com.advocacia.enums.*;
 import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public class ProcessoRequest {
     
@@ -11,10 +12,10 @@ public class ProcessoRequest {
     public String numeroProcesso;
 
     public StatusProcesso status;
-    public String tipoAcao;
-    public String tipoCliente;
+    public String tipoAcao, tipoCliente;
     public Long clienteId;
     public String clienteNome;
+    public List<ClienteProcessoDTO> clientes;
     public Qualificacao qualificacao;
     public Boolean prazoAberto;
     public LocalDate dataPrazo;

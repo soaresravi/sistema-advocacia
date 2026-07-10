@@ -21,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.text.Normalizer;
 
 @Path("/processos")
 @Produces(MediaType.APPLICATION_JSON)
@@ -67,11 +68,17 @@ public class ProcessoResource {
         return Long.parseLong(jwt.getSubject());
     }
 
+    private String removerAcentos(String texto) {
+        if (texto == null) return null;
+        String normalizado = Normalizer.normalize(texto, Normalizer.Form.NFD);
+        return normalizado.replaceAll("\\p{M}", "").toUpperCase();
+    }
+
     @GET
 
     public Response listar(@QueryParam("page") @DefaultValue("0") int page, @QueryParam("size") @DefaultValue("10") int size, @QueryParam("status") String status, @QueryParam("tipoCliente") String tipoCliente, @QueryParam("prazoAberto") String prazoAberto, @QueryParam("fase") String fase, @QueryParam("search") String search) {
 
-        StringBuilder query = new StringBuilder("userId = ?1");
+        StringBuilder query = new StringBuilder("from Processo p where p.userId = ?1");
         List<Object> params = new ArrayList<>();
 
         params.add(getUserId());
@@ -97,10 +104,13 @@ public class ProcessoResource {
         }
 
         if (search != null && !search.isEmpty()) {
-            query.append(" and (lower(numeroProcesso) like ?").append(params.size() + 1);
+            query.append(" and (lower(p.numeroProcesso) like ?").append(params.size() + 1);
             params.add("%" + search.toLowerCase() + "%");
-            query.append(" or lower(clienteNome) like ?").append(params.size() + 1);
+            query.append(" or lower(p.clienteNome) like ?").append(params.size() + 1);
             params.add("%" + search.toLowerCase() + "%");
+            query.append(" or exists (select 1 from ProcessoCliente pc where pc.processoId = p.id and lower(pc.clienteNome) like ?").append(params.size() + 1);
+            params.add("%" + search.toLowerCase() + "%");
+            query.append(")");
             query.append(")");
         }
 
@@ -138,9 +148,29 @@ public class ProcessoResource {
     @Transactional
 
     public Response criar(ProcessoRequest request) {
+       
         Processo processo = new Processo();
         processo.userId = getUserId();
-        updateEntity(processo, request);
+        updateEntityWithoutClients(processo, request);
+        processo.persist();
+        
+        if (request.clientes != null && !request.clientes.isEmpty()) {
+            
+            for (ClienteProcessoDTO dto : request.clientes) {
+                
+                ProcessoCliente pc = new ProcessoCliente();
+                
+                pc.processoId = processo.id;
+                pc.clienteId = dto.clienteId;
+                pc.clienteNome = dto.clienteNome;
+                pc.tipoCliente = dto.tipoCliente;
+                pc.qualificacao = dto.qualificacao;
+                processo.clientes.add(pc);
+            
+            }
+        
+        }
+        
         processo.persist();
         logService.registrar(getUserId(), "CREATE", "Processo", processo.id, "Criou processo: " + processo.numeroProcesso + " - Cliente: " + processo.clienteNome, getClientIp(), getUserAgent());
         return Response.status(Response.Status.CREATED).entity(toResponse(processo)).build();
@@ -454,8 +484,77 @@ public class ProcessoResource {
         response.createdAt = entity.createdAt;
         response.updatedAt = entity.updatedAt;
 
+        if (entity.clientes != null && !entity.clientes.isEmpty()) {
+            
+            response.clientes = entity.clientes.stream().map(pc -> {
+            
+                ClienteProcessoDTO dto = new ClienteProcessoDTO();
+            
+                dto.clienteId = pc.clienteId;
+                dto.clienteNome = pc.clienteNome;
+                dto.tipoCliente = pc.tipoCliente;
+                dto.qualificacao = pc.qualificacao;
+                
+                return dto;
+            
+            }).collect(Collectors.toList());
+        
+        } else if (entity.clienteId != null && entity.clienteNome != null) {
+          
+            ClienteProcessoDTO dto = new ClienteProcessoDTO();
+          
+            dto.clienteId = entity.clienteId;
+            dto.clienteNome = entity.clienteNome;
+            dto.tipoCliente = entity.tipoCliente;
+            dto.qualificacao = entity.qualificacao != null ? entity.qualificacao.name() : null;
+          
+            response.clientes = Collections.singletonList(dto);
+        
+        }
+
         return response;
 
+    }
+
+    private void updateEntityWithoutClients(Processo entity, ProcessoRequest request) {
+        
+        entity.numeroProcesso = request.numeroProcesso;
+        entity.status = request.status != null ? request.status : StatusProcesso.ATIVO;
+        entity.tipoAcao = request.tipoAcao;
+        entity.tipoCliente = request.tipoCliente;
+        entity.prazoAberto = request.prazoAberto;
+        entity.dataPrazo = request.dataPrazo;
+        entity.outroEnvolvido = request.outroEnvolvido;
+        entity.qualificacaoOutro = request.qualificacaoOutro;
+        entity.valorCausa = request.valorCausa;
+        entity.valorAcordoSentenca = request.valorAcordoSentenca;
+        entity.honorariosReais = request.honorariosReais;
+        entity.honorariosPercentual = request.honorariosPercentual;
+        entity.sucumbencias = request.sucumbencias;
+        entity.fase = request.fase;
+        entity.instancia = request.instancia;
+        entity.comarca = request.comarca;
+        entity.vara = request.vara;
+        entity.observacoes = request.observacoes;
+        entity.dataInicio = request.dataInicio;
+        entity.dataFim = request.dataFim;
+        entity.resultado = request.resultado;
+        entity.linkProcesso = request.linkProcesso;
+    
+        if (request.clientes != null && !request.clientes.isEmpty()) {
+            ClienteProcessoDTO primeiro = request.clientes.get(0);
+            entity.clienteId = primeiro.clienteId;
+            entity.clienteNome = primeiro.clienteNome;
+            entity.qualificacao = primeiro.qualificacao != null ? Qualificacao.valueOf(removerAcentos(primeiro.qualificacao)) : null;
+        } else {
+            entity.clienteId = null;
+            entity.clienteNome = null;
+            entity.qualificacao = null;
+        }
+    
+        entity.calcularTotalHonorarios();
+        entity.calcularDuracao();
+    
     }
 
     private void updateEntity(Processo entity, ProcessoRequest request) {
@@ -485,6 +584,40 @@ public class ProcessoResource {
         entity.dataFim = request.dataFim;
         entity.resultado = request.resultado;
         entity.linkProcesso = request.linkProcesso;
+
+        if (request.clientes != null) {
+
+            entity.clientes.clear();
+
+            for (ClienteProcessoDTO dto : request.clientes) {
+                
+                ProcessoCliente pc = new ProcessoCliente();
+
+                pc.processoId = entity.id;
+                pc.clienteId = dto.clienteId;
+                pc.clienteNome = dto.clienteNome;
+                pc.tipoCliente = dto.tipoCliente;
+                pc.qualificacao = dto.qualificacao;
+                
+                entity.clientes.add(pc);
+            
+            }
+
+            if (!request.clientes.isEmpty()) {
+                
+                ClienteProcessoDTO primeiro = request.clientes.get(0);
+                
+                entity.clienteId = primeiro.clienteId;
+                entity.clienteNome = primeiro.clienteNome;
+                entity.qualificacao = primeiro.qualificacao != null ? Qualificacao.valueOf(removerAcentos(primeiro.qualificacao)) : null;
+            
+            } else {
+                entity.clienteId = null;
+                entity.clienteNome = null;
+                entity.qualificacao = null;
+            }
+
+        }
 
         entity.calcularTotalHonorarios();
         entity.calcularDuracao();

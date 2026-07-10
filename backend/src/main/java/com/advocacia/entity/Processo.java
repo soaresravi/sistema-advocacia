@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Entity
 @Table(name = "processos")
@@ -19,8 +20,12 @@ public class Processo extends PanacheEntity {
     @Enumerated(EnumType.STRING)
     public StatusProcesso status;
 
-    public String tipoAcao;
-    public String tipoCliente;
+    public String tipoAcao, tipoCliente;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "processo_id", nullable = false)
+    public List<ProcessoCliente> clientes = new ArrayList<>();
+
     public Long clienteId;
     public String clienteNome;
 
