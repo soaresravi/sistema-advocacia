@@ -123,8 +123,8 @@ export const deleteTipoAcao = async (id) => {
 export const getClientesOptions = async () => {
 
     const [pf, pj] = await Promise.all([
-        api.get('/clientes/pf?size=100'),
-        api.get('/clientes/pj?size=100'),
+        api.get('/clientes/pf?size=9999'),
+        api.get('/clientes/pj?size=9999'),
     ]);
 
     return {
